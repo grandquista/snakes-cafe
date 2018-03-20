@@ -4,16 +4,21 @@
 **Version**: 1.0.0
 
 ## Overview
-<!-- Provide a high level overview of what this application is and why you are building it, beyond the fact that it's an assignment for a Code Fellows 401 class. (i.e. What's your problem domain?) -->
+This is a cafe menu that prompts the user for an order. It then acknowledges the user's order by printing what they ordered, and the amount.
 
 ## Getting Started
-<!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
+To build this app, create a dictionary that contains the menu of the cafe. Write code that displays the menu to user. Display an intro, and prompt the user for their order. Acknowledge the user's order by displaying the ordered item, and the amount. If the item is not on the menu, tell the user it is not on the menu.
 
 ## Architecture
-<!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. This is also an area which you can include any visuals; flow charts, example usage gifs, screen captures, etc.-->
+This application is written using Python3, and Markdown for the README.
 
 ## API
-<!-- Provide detailed instructions for your applications usage. This should include any methods or endpoints available to the user/client/developer. Each section should be formatted to provide clear syntax for usage, example calls including input data requirements and options, and example responses or return values. -->
+No API is used for this project.
 
 ## Change Log
+
+#### Day 1
+03-19-2018 5:20pm - 
 03-19-2018 4:33pm - Created project framework.
+
+#### Day 2
