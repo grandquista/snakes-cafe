@@ -1,6 +1,8 @@
 """Snakes Cafe ordering menu."""
 
 from typing import Dict
+from decimal import Decimal
+import math
 
 INSTRUCTIONS_HEADER = '''
 **************************************
@@ -191,6 +193,25 @@ def handle_input(order, user_request):
             order[user_request] = order.get(user_request, 0) + 1
             print(ORDER_RESPONSE.format(order[user_request], user_request))
     return True
+
+
+def sub_total_cost(order):
+    cost = 0
+    for food, quantity in order.items():
+        cost += MENU[food]['price'] * quantity
+    return cost
+
+
+SALES_TAX = 0.101
+
+
+def calculate_sales_tax(cost):
+    raw_sales_tax = cost * SALES_TAX
+    return math.ceil(raw_sales_tax * 100) / 100
+
+
+def total_cost():
+    pass
 
 
 def main() -> None:

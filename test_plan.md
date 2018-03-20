@@ -7,13 +7,12 @@ If you change your tests, update your test plan -->
 ## Existing functions
 
 #### handle_input
-check that it prompts user for input
 check that it returns false when the user enters quit
 check that otherwise it returns true
 check that user input is not case sensitive
 
 #### menu_display
-Test menu display by examining if the menu prints, and has all desired items and categories
+NO TEST
 
 #### main
 NO TEST
@@ -23,7 +22,12 @@ takes user input
 ## Planned Day 2 Functions
 
 #### total_cost
+test that it returns 0 when the order is empty
 test that it takes an order and returns the total cost with tax
+
+#### sub_total_cost
+test that it returns 0 when the order is empty
+test that it takes an order and returns the total cost
 
 #### display_order
 test that when the user types order all the items in their order are displayed, with total cost
