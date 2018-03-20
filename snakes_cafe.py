@@ -91,10 +91,13 @@ def menu_display():
             print(item.title())
 
 
-# function handles input
-# false for exit, true otherwise
-def handle_input(order):
-    user_request = input(USER_INPUT_REQUEST)
+
+
+def handle_input(order, user_request):
+    """
+    function handles input
+    false for exit, true otherwise
+    """
     user_request = user_request.strip().lower()
     if user_request == 'quit':
             return False
@@ -110,7 +113,7 @@ def main() -> None:
     """main."""
     menu_display()
     order = {}
-    while handle_input(order):
+    while handle_input(order, user_request=input(USER_INPUT_REQUEST)):
         pass
 
         
