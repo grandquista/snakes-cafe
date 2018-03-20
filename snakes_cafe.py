@@ -29,40 +29,124 @@ ORDER_RESPONSE = '''
 
 MENU = {
     'wings': {
-        'categories': 'appetizers'
+        'categories': 'appetizers',
+        'price': 7.77
     },
     'cookies': {
-        'categories': 'appetizers'
+        'categories': 'appetizers',
+        'price': 100.0
     },
     'spring rolls': {
-        'categories': 'appetizers'
+        'categories': 'appetizers',
+        'price': 4.0
+    },
+    'fries': {
+        'categories': 'appetizers',
+        'price': 1.50
+    },
+    'calimari': {
+        'categories': 'appetizers',
+        'price': 3.45
+    },
+    'gyoza': {
+        'categories': 'appetizers',
+        'price': 6.78
     },
     'salmon': {
-        'categories': 'entrees'
+        'categories': 'entrees',
+        'price': 16.0
     },
     'steak': {
-        'categories': 'entrees'
+        'categories': 'entrees',
+        'price': 20.0
     },
     'meat tornado': {
-        'categories': 'entrees'
+        'categories': 'entrees',
+        'price': 12.01
+    },
+    'spaghetti': {
+        'categories': 'entrees',
+        'price': 12.34
+    },
+    'tofu': {
+        'categories': 'entrees',
+        'price': 8.0
+    },
+    'stir fry': {
+        'categories': 'entrees',
+        'price': 10
     },
     'ice cream': {
-        'categories': 'desserts'
+        'categories': 'desserts',
+        'price': 5.00
     },
     'cake': {
-        'categories': 'desserts'
+        'categories': 'desserts',
+        'price': 3.99
     },
-    'pie': {
-        'categories': 'desserts'
+    'whole pie': {
+        'categories': 'desserts',
+        'price': 30.0
+    },
+    'tiramisu': {
+        'categories': 'desserts',
+        'price': 5.01
+    },
+    'mixed fruit': {
+        'categories': 'desserts',
+        'price': 0.0
+    },
+    'half a cookie': {
+        'categories': 'desserts',
+        'price': 0.50
     },
     'coffee': {
-        'categories': 'drinks'
+        'categories': 'drinks',
+        'price': 0.85
     },
     'tea': {
-        'categories': 'drinks'
+        'categories': 'drinks',
+        'price': 0.60
     },
     'blood of the innocent': {
-        'categories': 'drinks'
+        'categories': 'drinks',
+        'price': 666.66
+    },
+    'orange juice': {
+        'categories': 'drinks',
+        'price': 2
+    },
+    'smoothie': {
+        'categories': 'drinks',
+        'price': 3.5
+    },
+    'ice cream float': {
+        'categories': 'drinks',
+        'price': 3.25
+    },
+    'coleslaw': {
+        'categories': 'sides',
+        'price': 1.00
+    },
+    '5 cheese sticks': {
+        'categories': 'sides',
+        'price': 2.00
+    },
+    'garlic bread': {
+        'categories': 'sides',
+        'price': 2.22
+    },
+    'chips with avocado dip': {
+        'categories': 'sides',
+        'price': 1.32
+    },
+    'salad': {
+        'categories': 'sides',
+        'price': 0.75
+    },
+    'fondue': {
+        'categories': 'sides',
+        'price': 4.80
     },
 }
 
