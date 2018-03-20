@@ -18,7 +18,8 @@ No API is used for this project.
 ## Change Log
 
 #### Day 1
-03-19-2018 5:20pm - 
+03-19-2018 6:00pm - Displays the menu to the user.
+03-19-2018 5:20pm - Wrote app functionality. Wrote menu dictionary, wrote code to accept user input, displays menu choice back to user, quits when user types quit.
 03-19-2018 4:33pm - Created project framework.
 
 #### Day 2

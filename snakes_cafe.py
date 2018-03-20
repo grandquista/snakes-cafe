@@ -67,9 +67,36 @@ MENU = {
 }
 
 
+def menu_display():
+    print('Appetizers')
+    print('----------')
+    for item, properties in MENU.items():
+        if properties['categories'] == 'appetizers':
+            print(item.title())
+    print()
+    print('Entrees')
+    print('-------')
+    for item, properties in MENU.items():
+        if properties['categories'] == 'entrees':
+            print(item.title())
+    print()
+    print('Desserts')
+    print('--------')
+    for item, properties in MENU.items():
+        if properties['categories'] == 'desserts':
+            print(item.title())
+    print()
+    print('Drinks')
+    print('------')        
+    for item, properties in MENU.items():
+        if properties['categories'] == 'drinks':
+            print(item.title())
+
+
 def main() -> None:
     """main."""
     print(INSTRUCTIONS_HEADER)
+    menu_display()
     order: Dict[str, int] = {}
     while True:
         user_request = input(USER_INPUT_REQUEST)
