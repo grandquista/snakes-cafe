@@ -68,6 +68,7 @@ MENU = {
 
 
 def menu_display():
+    print(INSTRUCTIONS_HEADER)
     print('Appetizers')
     print('----------')
     for item, properties in MENU.items():
@@ -90,25 +91,29 @@ def menu_display():
             print(item.title())
 
 
-def main() -> None:
-    """main."""
-    print(INSTRUCTIONS_HEADER)
-    menu_display()
-    order: Dict[str, int] = {}
-    while True:
-        user_request = input(USER_INPUT_REQUEST)
-        user_request = user_request.strip().lower()
-        if user_request == 'quit':
-            break
-        if user_request not in MENU:
+# function handles input
+# false for exit, true otherwise
+def handle_input(order):
+    user_request = input(USER_INPUT_REQUEST)
+    user_request = user_request.strip().lower()
+    if user_request == 'quit':
+            return False
+    if user_request not in MENU:
             print(MENU_ERROR.format(user_request))
-        # elif True:
-        #     pass
-        else:
+    else:
             order[user_request] = order.get(user_request, 0) + 1
             print(ORDER_RESPONSE.format(order[user_request], user_request))
+    return True
 
 
+def main() -> None:
+    """main."""
+    menu_display()
+    order = {}
+    while handle_input(order):
+        pass
+
+        
 if __name__ == '__main__':
     try:
         main()
