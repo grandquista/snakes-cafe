@@ -73,20 +73,17 @@ def menu_display():
     for item, properties in MENU.items():
         if properties['categories'] == 'appetizers':
             print(item.title())
-    print()
-    print('Entrees')
+    print('\nEntrees')
     print('-------')
     for item, properties in MENU.items():
         if properties['categories'] == 'entrees':
             print(item.title())
-    print()
-    print('Desserts')
+    print('\nDesserts')
     print('--------')
     for item, properties in MENU.items():
         if properties['categories'] == 'desserts':
             print(item.title())
-    print()
-    print('Drinks')
+    print('\nDrinks')
     print('------')        
     for item, properties in MENU.items():
         if properties['categories'] == 'drinks':
