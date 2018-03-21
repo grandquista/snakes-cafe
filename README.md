@@ -26,9 +26,13 @@ No API is used for this project.
 03-19-2018 4:33pm - Created project framework.
 
 #### Day 2
+03-19-2018 9:00pm - uuid imported to provide unique order ID, user input dispatches on commands.
+
+03-19-2018 8:00pm - Fixed test for tax calculation and truncation.
+
 03-19-2018 5:00pm - 6 tests written, code passes 5/6 tests.
 
-03-19-2018 4:00pm - Prices added to each item. Subtotal and sales tax functions started, uuid imported for unique order ID.
+03-19-2018 4:00pm - Prices added to each item. Subtotal and sales tax functions started.
 
 03-19-2018 3:00pm - Added sides category, and made each category have 6 items.
 
