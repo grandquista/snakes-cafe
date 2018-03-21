@@ -199,6 +199,9 @@ def category_display(category):
 
 
 def menu_display():
+    """
+    Provide a menu for users.
+    """
     print(INSTRUCTIONS_HEADER)
     for category in sorted(CATEGORY_VIEW.keys()):
         print()
@@ -206,10 +209,16 @@ def menu_display():
 
 
 def format_food_quantity(food, quantity):
+    """
+    Format beginning of receipt line item.
+    """
     return '{} x{}'.format(food, quantity)
 
 
 def receipt_display(order):
+    """
+    Format an order into a receipt.
+    """
     sub_total = sub_total_cost(order)
     print(ORDER_RECEIPT.format(
         id=order['id'],
@@ -230,6 +239,11 @@ def receipt_display(order):
 
 
 def remove_order_item(order, *food):
+    """
+    Remove food from order if contained.
+
+    Inform the user if the item had not been added to their order.
+    """
     food = ' '.join(food)
     if food not in order:
         print('{} not in order'.format(food))
@@ -238,6 +252,9 @@ def remove_order_item(order, *food):
 
 
 def add_order_item(order, *food):
+    """
+    Add a food item to an order or inform user that it is not available.
+    """
     food = ' '.join(food)
     if food not in MENU:
         print(MENU_ERROR.format(food))
@@ -248,6 +265,9 @@ def add_order_item(order, *food):
 
 
 def handle_user_action(order, user_request):
+    """
+    Dispatch to handler functions based on user action verb.
+    """
     action, *options = user_request.split()
     if action == 'order':
         receipt_display(order)
@@ -276,10 +296,16 @@ def handle_input(order, user_request):
 
 
 def cost_of_items(food, quantity):
+    """
+    Retrieve the current price for a menu item and quantity.
+    """
     return MENU[food]['price'] * quantity
 
 
 def sub_total_cost(order):
+    """
+    Gather costs of idividual line items into a subtotal.
+    """
     cost = 0
     for food, quantity in order.items():
         if food == 'id':
@@ -289,20 +315,32 @@ def sub_total_cost(order):
 
 
 def calculate_sales_tax(cost):
+    """
+    Calculate additional cost from sales tax.
+    """
     return math.ceil(cost * SALES_TAX) / 100
 
 
 def total_cost(order):
+    """
+    Calculate cost of order with sales tax added.
+    """
     sub_total = sub_total_cost(order)
     sales_tax = calculate_sales_tax(sub_total)
     return sub_total + sales_tax
 
 
 def generate_blank_order_with_id():
+    """
+    Create a new order with needed metadata.
+    """
     return {'id': uuid4()}
 
 
 def clean_input(*args):
+    """
+    Handle standard input exceptions and get input line.
+    """
     try:
         return input(*args)
     except EOFError:
