@@ -92,3 +92,27 @@ def test_handle_user_action_display_order():
     sc.add_order_item(order, 'salad')
     sc.handle_user_action(order, 'order')
     assert order['salad'] == 3
+
+
+def test_cost_of_items_2_salad():
+    assert sc.cost_of_items('salad', 2) == 1.5
+
+
+def test_cost_of_items_2_tofu():
+    assert sc.cost_of_items('tofu', 2) == 16.0
+
+
+def test_sub_total_cost_3_salad():
+    assert sc.sub_total_cost({'salad': 3}) == 2.25
+
+
+def test_sub_total_cost_3_tofu():
+    assert sc.sub_total_cost({'tofu': 3}) == 24.0
+
+
+def test_total_cost_3_salad():
+    assert sc.total_cost({'salad': 3}) == 2.48
+
+
+def test_total_cost_3_tofu():
+    assert sc.total_cost({'tofu': 3}) == 26.43
