@@ -267,7 +267,9 @@ def handle_input(order, user_request):
     false for exit, true otherwise
     """
     user_request = user_request.strip().lower()
-    if user_request == 'quit':
+    if not user_request:
+        return True
+    elif user_request == 'quit':
         return False
     handle_user_action(order, user_request)
     return True
