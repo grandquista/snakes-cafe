@@ -27,7 +27,7 @@ ORDER_RECEIPT = '''
 The Snakes Cafe
 "Eatability Counts"
 
-Order {id}
+Order #{id}
 ===========================================
 {items}
 -------------------------------------------
@@ -206,8 +206,22 @@ def menu_display():
 
 
 def receipt_display(order):
-    print(ORDER_RECEIPT)
-    print(ORDER_RECEIPT_LINE_ITEM)
+    sub_total = sub_total_cost(order)
+    print(ORDER_RECEIPT.format(
+        id=order['id'],
+        total_due=currency(total_cost(order)),
+        subtotal=currency(sub_total),
+        sales_tax=currency(calculate_sales_tax(sub_total)),
+        items='\n'.join(
+            ORDER_RECEIPT_LINE_ITEM.format(
+                food=food,
+                quantity=quantity,
+                cost=currency(cost_of_items(food, quantity))
+            )
+            for food, quantity in order.items()
+            if food != 'id'
+        )
+    ))
 
 
 def remove_order_item(order, *food):
@@ -254,12 +268,16 @@ def handle_input(order, user_request):
     return True
 
 
+def cost_of_items(food, quantity):
+    return MENU[food]['price'] * quantity
+
+
 def sub_total_cost(order):
     cost = 0
     for food, quantity in order.items():
         if food == 'id':
             continue
-        cost += MENU[food]['price'] * quantity
+        cost += cost_of_items(food, quantity)
     return cost
 
 
