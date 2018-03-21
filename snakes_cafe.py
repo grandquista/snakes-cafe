@@ -181,6 +181,23 @@ def menu_display():
         category_display(category)
 
 
+def handle_user_action(order, user_request):
+    action, *options = user_request.split()
+    if user_request == 'order':
+        pass
+    elif user_request == 'menu':
+        menu_display()
+    elif options and action == 'remove':
+        pass
+    elif user_request in CATEGORY_VIEW:
+        category_display(user_request)
+    elif user_request not in MENU:
+        print(MENU_ERROR.format(user_request))
+    else:
+        order[user_request] = order.get(user_request, 0) + 1
+        print(ORDER_RESPONSE.format(order[user_request], user_request))
+
+
 def handle_input(order, user_request):
     """
     function handles input
@@ -188,12 +205,8 @@ def handle_input(order, user_request):
     """
     user_request = user_request.strip().lower()
     if user_request == 'quit':
-            return False
-    if user_request not in MENU:
-            print(MENU_ERROR.format(user_request))
-    else:
-            order[user_request] = order.get(user_request, 0) + 1
-            print(ORDER_RESPONSE.format(order[user_request], user_request))
+        return False
+    handle_user_action(order, user_request)
     return True
 
 
