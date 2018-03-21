@@ -2,6 +2,9 @@
 
 import math
 
+from queue import Queue
+from uuid import uuid4
+
 INSTRUCTIONS_HEADER = '''
 **************************************
 **    Welcome to the Snakes Cafe!   **
@@ -216,6 +219,8 @@ def handle_input(order, user_request):
 def sub_total_cost(order):
     cost = 0
     for food, quantity in order.items():
+        if food == 'id':
+            continue
         cost += MENU[food]['price'] * quantity
     return cost
 
@@ -228,10 +233,14 @@ def total_cost():
     pass
 
 
+def generate_blank_order_with_id():
+    return {'id': uuid4()}
+
+
 def main():
     """main."""
     menu_display()
-    order = {}
+    order = generate_blank_order_with_id()
     while handle_input(order, user_request=input(USER_INPUT_REQUEST)):
         pass
 

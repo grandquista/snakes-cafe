@@ -33,8 +33,9 @@ def test_calculate_sales_tax_is_10_1_percent():
     assert sc.calculate_sales_tax(1.00) == 0.11
 
 
-
-
-
-
-
+def test_generate_blank_order_with_id():
+    first_order = sc.generate_blank_order_with_id()
+    assert first_order
+    second_order = sc.generate_blank_order_with_id()
+    assert second_order
+    assert first_order['id'] != second_order['id']
