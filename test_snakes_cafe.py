@@ -39,3 +39,35 @@ def test_generate_blank_order_with_id():
     second_order = sc.generate_blank_order_with_id()
     assert second_order
     assert first_order['id'] != second_order['id']
+
+
+def test_format_food_quantity_3():
+    assert sc.format_food_quantity('food', 3) == 'food x3'
+
+
+def test_format_food_quantity_1():
+    assert sc.format_food_quantity('food', 1) == 'food x1'
+
+
+def test_remove_order_item_in_order():
+    order = {'food': 6}
+    sc.remove_order_item(order, 'food')
+    assert order['food'] == 5
+
+
+def test_remove_order_item_not_in_order():
+    order = {'food': 6}
+    sc.remove_order_item(order, 'tofu')
+    assert order['food'] == 6
+
+
+def test_add_order_item_in_menu():
+    order = {}
+    sc.add_order_item(order, 'tofu')
+    assert order['tofu'] == 1
+
+
+def test_add_order_item_not_in_menu():
+    order = {}
+    sc.add_order_item(order, 'food')
+    assert not order
