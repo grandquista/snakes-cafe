@@ -157,6 +157,9 @@ for food, details in MENU.items():
     CATEGORY_VIEW.setdefault(categories, []).append(food)
 
 
+SALES_TAX = 10.1
+
+
 def category_display(category):
     """
     Display a single category with possible menu items.
@@ -217,12 +220,8 @@ def sub_total_cost(order):
     return cost
 
 
-SALES_TAX = 0.101
-
-
 def calculate_sales_tax(cost):
-    raw_sales_tax = cost * SALES_TAX
-    return math.ceil(raw_sales_tax * 100) / 100
+    return math.ceil(cost * SALES_TAX) / 100
 
 
 def total_cost():
