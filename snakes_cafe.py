@@ -2,7 +2,10 @@
 
 import math
 
+from locale import LC_ALL, currency, setlocale
 from uuid import uuid4
+
+setlocale(LC_ALL, '')
 
 INSTRUCTIONS_HEADER = '''
 **************************************
@@ -207,21 +210,36 @@ def receipt_display(order):
     print(ORDER_RECEIPT_LINE_ITEM)
 
 
+def remove_order_item(order, *food):
+    food = ' '.join(food)
+    if food not in order:
+        print('{} not in order'.format(food))
+    else:
+        order[food] -= 1
+
+
+def add_order_item(order, *food):
+    food = ' '.join(food)
+    if food not in MENU:
+        print(MENU_ERROR.format(food))
+        return
+    order[food] = order.get(food, 0) + 1
+    print(ORDER_RESPONSE.format(order[food], food))
+    print('cost of order so far in {}'.format(currency(total_cost(order))))
+
+
 def handle_user_action(order, user_request):
     action, *options = user_request.split()
-    if user_request == 'order':
+    if action == 'order':
         receipt_display(order)
-    elif user_request == 'menu':
+    elif action == 'menu':
         menu_display()
-    elif options and action == 'remove':
-        pass
-    elif user_request in CATEGORY_VIEW:
+    elif action == 'remove':
+        remove_order_item(order, *options)
+    elif action in CATEGORY_VIEW:
         category_display(user_request)
-    elif user_request not in MENU:
-        print(MENU_ERROR.format(user_request))
     else:
-        order[user_request] = order.get(user_request, 0) + 1
-        print(ORDER_RESPONSE.format(order[user_request], user_request))
+        add_order_item(order, action, *options)
 
 
 def handle_input(order, user_request):
@@ -249,19 +267,28 @@ def calculate_sales_tax(cost):
     return math.ceil(cost * SALES_TAX) / 100
 
 
-def total_cost():
-    pass
+def total_cost(order):
+    sub_total = sub_total_cost(order)
+    sales_tax = calculate_sales_tax(sub_total)
+    return sub_total + sales_tax
 
 
 def generate_blank_order_with_id():
     return {'id': uuid4()}
 
 
+def clean_input(*args):
+    try:
+        return input(*args)
+    except EOFError:
+        return 'quit'
+
+
 def main():
     """main."""
     menu_display()
     order = generate_blank_order_with_id()
-    while handle_input(order, user_request=input(USER_INPUT_REQUEST)):
+    while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
         pass
 
 
