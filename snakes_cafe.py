@@ -1,7 +1,5 @@
 """Snakes Cafe ordering menu."""
 
-from typing import Dict
-from decimal import Decimal
 import math
 
 INSTRUCTIONS_HEADER = '''
@@ -153,30 +151,34 @@ MENU = {
 }
 
 
+CATEGORY_VIEW = {}
+for food, details in MENU.items():
+    categories = details['categories']
+    CATEGORY_VIEW.setdefault(categories, []).append(food)
+
+
+def category_display(category):
+    """
+    Display a single category with possible menu items.
+
+    See sample output below
+
+    Category
+    --------
+    Food1
+    Food2
+    """
+    print(category.title())
+    print('-' * len(category))
+    for food in CATEGORY_VIEW[category]:
+        print(food.title())
+
+
 def menu_display():
     print(INSTRUCTIONS_HEADER)
-    print('Appetizers')
-    print('----------')
-    for item, properties in MENU.items():
-        if properties['categories'] == 'appetizers':
-            print(item.title())
-    print('\nEntrees')
-    print('-------')
-    for item, properties in MENU.items():
-        if properties['categories'] == 'entrees':
-            print(item.title())
-    print('\nDesserts')
-    print('--------')
-    for item, properties in MENU.items():
-        if properties['categories'] == 'desserts':
-            print(item.title())
-    print('\nDrinks')
-    print('------')        
-    for item, properties in MENU.items():
-        if properties['categories'] == 'drinks':
-            print(item.title())
-
-
+    for category in sorted(CATEGORY_VIEW.keys()):
+        print()
+        category_display(category)
 
 
 def handle_input(order, user_request):
@@ -221,7 +223,7 @@ def main() -> None:
     while handle_input(order, user_request=input(USER_INPUT_REQUEST)):
         pass
 
-        
+
 if __name__ == '__main__':
     try:
         main()
