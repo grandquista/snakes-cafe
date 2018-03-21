@@ -2,7 +2,6 @@
 
 import math
 
-from queue import Queue
 from uuid import uuid4
 
 INSTRUCTIONS_HEADER = '''
@@ -19,6 +18,24 @@ USER_INPUT_REQUEST = '''
 ** What would you like to order? **
 ***********************************
 > '''
+
+ORDER_RECEIPT = '''
+*******************************************
+The Snakes Cafe
+"Eatability Counts"
+
+Order {id}
+===========================================
+{items}
+-------------------------------------------
+Subtotal                         {subtotal}
+Sales Tax                       {sales_tax}
+---------
+Total Due                       {total_due}
+*******************************************
+'''
+
+ORDER_RECEIPT_LINE_ITEM = '{food} x{quantity} {cost}'
 
 MENU_ERROR = '''
 ***********************************
@@ -153,12 +170,10 @@ MENU = {
     },
 }
 
-
 CATEGORY_VIEW = {}
 for food, details in MENU.items():
     categories = details['categories']
     CATEGORY_VIEW.setdefault(categories, []).append(food)
-
 
 SALES_TAX = 10.1
 
