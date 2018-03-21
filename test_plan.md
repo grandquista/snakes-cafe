@@ -6,44 +6,46 @@ If you change your tests, update your test plan -->
 
 ## Existing functions
 
-#### handle_input
-check that it returns false when the user enters quit
-check that otherwise it returns true
-check that user input is not case sensitive
+#### test_handle_input
+  - check that it returns false when the user enters quit
+  - check that otherwise it returns true on a valid command
+  - check that user input is not case sensitive
 
-#### menu_display
-NO TEST
+#### test_calculate_sales_tax
+  - test that it correctly calculates 10.1 % sales tax from the total before tax (subtotal)
 
-#### main
-NO TEST
-takes user input
+#### test_generate_blank_order_with_id
+  - test that a unique id is generated for each order
 
+#### test_format_food_quantity
+  - test for expected string formatting of food receipt line
 
-## Planned Day 2 Functions
+#### test_remove_order_item
+  - test that it removes the corresponding item when the user types remove the name of the item, and that it then triggers the order to display
+  - test that it does nothing when item is not in order
 
-#### total_cost
-test that it returns 0 when the order is empty
-test that it takes an order and returns the total cost with tax
+#### test_add_order_item
+  - item on the menu is added to the order total
+  - item not on the menu is ignored
 
-#### sub_total_cost
-test that it returns 0 when the order is empty
-test that it takes an order and returns the total cost
+#### test_handle_user_action
+  - test that `remove` user command functions
+  - test that `add` user command functions
+  - test that `order` user command functions
 
-#### display_order
-test that when the user types order all the items in their order are displayed, with total cost
+#### test_cost_of_items
+  - test cost with 2 salads
+  - test cost with default empty order
+  - test cost with 2 tofu
 
-#### generate_blank_order_with_id
-test that a new order is added to the queue
+#### test_sub_total_cost
+  - test that it returns 0 when the order is empty
+  - test sub total cost with 3 salads
+  - test sub total cost with 3 tofu
 
-#### calculate_sales_tax
-test that it correctly calculate sales tax from the total before tax (subtotal)
+#### test_total_cost
+  - test that it returns 0 when the order is empty
+  - test cost with 3 salads
+  - test cost with 3 tofu
 
-#### print_menu
-test that it displays the menu only when the user types menu
-
-#### present_categories
-test that it displays the categories and their items to the user when the user types the corresponding category name
-
-#### remove_item
-test that it removes the corresponding item when the user types remove the name of the item, and that it then triggers the order to display
-
+## Planned Functions

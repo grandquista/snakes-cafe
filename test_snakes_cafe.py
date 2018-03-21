@@ -106,12 +106,20 @@ def test_sub_total_cost_3_salad():
     assert sc.sub_total_cost({'salad': 3}) == 2.25
 
 
+def test_sub_total_cost_empty_order():
+    assert sc.sub_total_cost(sc.generate_blank_order_with_id()) == 0
+
+
 def test_sub_total_cost_3_tofu():
     assert sc.sub_total_cost({'tofu': 3}) == 24.0
 
 
 def test_total_cost_3_salad():
     assert sc.total_cost({'salad': 3}) == 2.48
+
+
+def test_total_cost_empty_order():
+    assert sc.total_cost(sc.generate_blank_order_with_id()) == 0
 
 
 def test_total_cost_3_tofu():
