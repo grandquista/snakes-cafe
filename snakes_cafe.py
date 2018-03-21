@@ -202,10 +202,15 @@ def menu_display():
         category_display(category)
 
 
+def receipt_display(order):
+    print(ORDER_RECEIPT)
+    print(ORDER_RECEIPT_LINE_ITEM)
+
+
 def handle_user_action(order, user_request):
     action, *options = user_request.split()
     if user_request == 'order':
-        pass
+        receipt_display(order)
     elif user_request == 'menu':
         menu_display()
     elif options and action == 'remove':
