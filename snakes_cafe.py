@@ -31,10 +31,10 @@ Order #{id}
 ===========================================
 {items}
 -------------------------------------------
-Subtotal                         {subtotal}
-Sales Tax                       {sales_tax}
+Subtotal {subtotal}
+Sales Tax {sales_tax}
 ---------
-Total Due                       {total_due}
+Total Due {total_due}
 *******************************************
 '''
 
@@ -209,9 +209,9 @@ def receipt_display(order):
     sub_total = sub_total_cost(order)
     print(ORDER_RECEIPT.format(
         id=order['id'],
-        total_due=currency(total_cost(order)),
-        subtotal=currency(sub_total),
-        sales_tax=currency(calculate_sales_tax(sub_total)),
+        total_due=format(currency(total_cost(order)), '>33'),
+        subtotal=format(currency(sub_total), '>34'),
+        sales_tax=format(currency(calculate_sales_tax(sub_total)), '>33'),
         items='\n'.join(
             ORDER_RECEIPT_LINE_ITEM.format(
                 food=food,
