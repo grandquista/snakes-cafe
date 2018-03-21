@@ -71,3 +71,24 @@ def test_add_order_item_not_in_menu():
     order = {}
     sc.add_order_item(order, 'food')
     assert not order
+
+
+def test_handle_user_action_remove_item():
+    order = {'salad': 3}
+    sc.handle_user_action(order, 'remove salad')
+    assert order['salad'] == 2
+
+
+def test_handle_user_action_add_item():
+    order = {'salad': 3}
+    sc.handle_user_action(order, 'salad')
+    assert order['salad'] == 4
+
+
+def test_handle_user_action_display_order():
+    order = sc.generate_blank_order_with_id()
+    sc.add_order_item(order, 'salad')
+    sc.add_order_item(order, 'salad')
+    sc.add_order_item(order, 'salad')
+    sc.handle_user_action(order, 'order')
+    assert order['salad'] == 3
