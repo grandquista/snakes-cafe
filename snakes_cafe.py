@@ -38,7 +38,7 @@ Total Due {total_due}
 *******************************************
 '''
 
-ORDER_RECEIPT_LINE_ITEM = '{food} x{quantity} {cost}'
+ORDER_RECEIPT_LINE_ITEM = '{food} {cost}'
 
 MENU_ERROR = '''
 ***********************************
@@ -205,6 +205,10 @@ def menu_display():
         category_display(category)
 
 
+def format_food_quantity(food, quantity):
+    return '{} x{}'.format(food, quantity)
+
+
 def receipt_display(order):
     sub_total = sub_total_cost(order)
     print(ORDER_RECEIPT.format(
@@ -214,10 +218,11 @@ def receipt_display(order):
         sales_tax=format(currency(calculate_sales_tax(sub_total)), '>33'),
         items='\n'.join(
             ORDER_RECEIPT_LINE_ITEM.format(
-                food=food,
-                quantity=quantity,
-                cost=currency(cost_of_items(food, quantity))
-            )
+                food=format_food_quantity(food, quantity),
+                cost=format(
+                    currency(cost_of_items(food, quantity)),
+                    '>{}'.format(
+                        42 - len(format_food_quantity(food, quantity)))))
             for food, quantity in order.items()
             if food != 'id'
         )
