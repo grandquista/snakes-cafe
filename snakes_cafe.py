@@ -216,7 +216,7 @@ def total_cost():
     pass
 
 
-def main() -> None:
+def main():
     """main."""
     menu_display()
     order = {}
