@@ -2,14 +2,21 @@
 
 import math
 
+from csv import DictReader
 from locale import LC_ALL, currency, setlocale
 from uuid import uuid4
 
 from default.menu import (
     CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, MENU_ERROR, ORDER_RECEIPT,
-    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, SALES_TAX, USER_INPUT_REQUEST)
+    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, SALES_TAX, USER_INPUT_REQUEST,
+    create_catgory_view)
 
 setlocale(LC_ALL, '')
+
+
+REQUEST_MENU_FILE = '''
+Would you like to provide a file for loading a menu?
+> '''
 
 
 def category_display(category):
@@ -169,6 +176,43 @@ def generate_blank_order_with_id():
     return {'id': uuid4()}
 
 
+def load_menu():
+    global CATEGORY_VIEW, MENU
+    file_name = clean_input(REQUEST_MENU_FILE)
+    if not file_name:
+        return
+    try:
+        with open(file_name) as istream:
+            csv_content = istream.read()
+    except OSError:
+        print('File {} could not be found'.format(file_name))
+        return
+    menu = {}
+    for row in DictReader(csv_content.splitlines(), fieldnames=[
+            'name', 'categories', 'price', 'quantity']):
+        try:
+            price = float(row['price'].strip())
+        except ValueError:
+            print('found ({}) invalid number price'.format(row['price']))
+            return
+        if row['quantity'] is None:
+            quantity = 1
+        else:
+            try:
+                quantity = int(row['quantity'].strip())
+            except ValueError:
+                print('found ({}) invalid integer quantity'.format(
+                    row['quantity']))
+                return
+        menu[row['name'].strip()] = {
+            'categories': row['categories'].strip(),
+            'price': price,
+            'quantity': quantity,
+        }
+    MENU = menu
+    CATEGORY_VIEW = create_catgory_view(MENU)
+
+
 def clean_input(*args):
     """
     Handle standard input exceptions and get input line.
@@ -181,6 +225,7 @@ def clean_input(*args):
 
 def main():
     """main."""
+    load_menu()
     menu_display()
     order = generate_blank_order_with_id()
     while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
