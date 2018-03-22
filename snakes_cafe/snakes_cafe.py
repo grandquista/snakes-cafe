@@ -1,5 +1,4 @@
 """Snakes Cafe ordering menu."""
-
 import math
 
 from csv import DictReader
