@@ -39,6 +39,21 @@ No API is used for this project.
 03-20-2018 2:00pm - Created new files, like test_plan.md and test_snakes_cafe.py
 
 #### Day 3
+
+03-21-2018 7:00pm - Added code to let user know the update total cost when they remove an item. Added prices to menu.csv.
+
+03-21-2018 6:45pm - Updated instructions to user.
+
+03-21-2018 6:00pm - Wrote code to allow user to specify a quantity of the item ordered. Wrote tests for new code.
+
+03-21-2018 5:45pm - Completed test cases for functions to improve coverage
+
+03-21-2018 5:30pm - Added menu items and quantities for each item.
+
+03-21-2018 5:15pm - Moved default options in to its own module.
+
+03-21-2018 5:00pm - Refactored code. Made application an installable module.
+
 03-21-2018 3:42pm - Update test plan based on new work.
 
 03-21-2018 3:20pm -

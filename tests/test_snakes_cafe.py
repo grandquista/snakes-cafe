@@ -20,6 +20,13 @@ def test_handle_input_not_case_sensitive():
     assert 'whole pie' in order
 
 
+def test_handle_input_takes_item_and_quantity():
+    order = {}
+    assert sc.handle_input(order, 'whole pie 5')
+    assert 'whole pie' in order
+    assert order['whole pie'] == 5
+
+
 def test_sub_total_cost_returns_zero_for_empty_order():
     assert sc.sub_total_cost({}) == 0
 
@@ -59,6 +66,13 @@ def test_remove_order_item_not_in_order():
     order = {'food': 6}
     sc.remove_order_item(order, 'tofu')
     assert order['food'] == 6
+
+
+def test_remove_order_item_erases_entry():
+    order = {'food': 2}
+    sc.remove_order_item(order, 'food')
+    sc.remove_order_item(order, 'food')
+    assert 'food' not in order
 
 
 def test_add_order_item_in_menu():
@@ -124,3 +138,21 @@ def test_total_cost_empty_order():
 
 def test_total_cost_3_tofu():
     assert sc.total_cost({'tofu': 3}) == 26.43
+
+
+def test_add_order_item_quantity_cannot_be_negative():
+    order_variable = sc.generate_blank_order_with_id()
+    sc.add_order_item(order_variable, 'tea', -1)
+    assert 'tea' not in order_variable
+
+
+def test_add_order_item_quantity_can_be_positive():
+    order_variable = sc.generate_blank_order_with_id()
+    sc.add_order_item(order_variable, 'tea', 1)
+    assert 'tea' in order_variable
+
+
+def test_add_order_item_quantity_cannot_exceed_stock():
+    order_variable = sc.generate_blank_order_with_id()
+    sc.add_order_item(order_variable, 'tea', 12)
+    assert 'tea' not in order_variable
