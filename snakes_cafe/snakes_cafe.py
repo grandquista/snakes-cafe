@@ -87,17 +87,30 @@ def remove_order_item(order, *food):
         print('{} not in order'.format(food))
     else:
         order[food] -= 1
+        if order[food] == 0:
+            order.pop(food)
 
 
 def add_order_item(order, *food):
     """
     Add a food item to an order or inform user that it is not available.
     """
-    food = ' '.join(food)
+    try:
+        quantity = int(food[-1])
+        food = ' '.join(food[:-1])
+
+    except:
+        quantity = 1
+        food = ' '.join(food)
     if food not in MENU:
         print(MENU_ERROR.format(food))
         return
-    order[food] = order.get(food, 0) + 1
+
+    if MENU[food]['quantity'] < quantity:
+        print('That is too many! Not enough in stock.')
+        return
+
+    order[food] = order.get(food, 0) + quantity
     print(ORDER_RESPONSE.format(order[food], food))
     print('cost of order so far in {}'.format(currency(total_cost(order))))
 

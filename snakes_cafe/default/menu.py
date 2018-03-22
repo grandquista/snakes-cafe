@@ -8,9 +8,15 @@ INSTRUCTIONS_HEADER = '''
 '''
 
 USER_INPUT_REQUEST = '''
-***********************************
-** What would you like to order? **
-***********************************
+****************************************************************
+**             What would you like to order?                  **
+**                  To quit  type "quit"                      **
+** To see categories, type the name of a category, eg "sides" **
+** To see the menu, type "menu"                               **
+** To see your order, type "order"                            **
+** To remove an item, type "remove <item>"                    **
+** To order, type "<item> number?" eg "tea 2"                 ** 
+****************************************************************
 > '''
 
 ORDER_RECEIPT = '''
