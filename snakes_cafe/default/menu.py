@@ -15,7 +15,7 @@ USER_INPUT_REQUEST = '''
 ** To see the menu, type "menu"                               **
 ** To see your order, type "order"                            **
 ** To remove an item, type "remove <item>"                    **
-** To order, type "<item> number?" eg "tea 2"                 ** 
+** To order, type "<item> number?" eg "tea 2"                 **
 ****************************************************************
 > '''
 

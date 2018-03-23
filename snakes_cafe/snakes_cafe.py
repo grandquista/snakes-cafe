@@ -53,145 +53,157 @@ def format_food_quantity(food, quantity):
     return '{} x{}'.format(food, quantity)
 
 
-def receipt_display(order):
-    """
-    Format an order into a receipt.
-    """
-    sub_total = sub_total_cost(order)
-    print(ORDER_RECEIPT.format(
-        id=order['id'],
-        total_due=format(currency(total_cost(order)), '>33'),
-        subtotal=format(currency(sub_total), '>34'),
-        sales_tax=format(currency(calculate_sales_tax(sub_total)), '>33'),
-        items='\n'.join(
-            ORDER_RECEIPT_LINE_ITEM.format(
-                food=format_food_quantity(food, quantity),
-                cost=format(
-                    currency(cost_of_items(food, quantity)),
-                    '>{}'.format(
-                        42 - len(format_food_quantity(food, quantity)))))
-            for food, quantity in order.items()
-            if food != 'id'
-        )
-    ))
+class Order:
+    def __init__(self):
+        """
+        Create a new order with needed metadata.
+        """
+        self.id = uuid4()
+        self._order = {}
 
+    def __getitem__(self, key):
+        return self._order[key]
 
-def remove_order_item(order, *food):
-    """
-    Remove food from order if contained.
+    def __setitem__(self, key, value):
+        self._order[key] = value
 
-    Inform the user if the item had not been added to their order.
-    """
-    food = ' '.join(food)
-    if food not in order:
-        print('{} not in order'.format(food))
-    else:
-        order[food] -= 1
-        print('cost of order so far in {}'.format(currency(total_cost(order))))
-        if order[food] == 0:
-            order.pop(food)
+    def __len__(self):
+        return len(self._order)
 
+    def __bool__(self):
+        return bool(self._order)
 
-def add_order_item(order, *food):
-    """
-    Add a food item to an order or inform user that it is not available.
-    """
-    try:
-        quantity = int(food[-1])
-        food = ' '.join(food[:-1])
-    except(ValueError):
-        quantity = 1
+    def __iter__(self):
+        return iter(self._order.items())
+
+    def __contains__(self, key):
+        return key in self._order
+
+    def receipt_display(self):
+        """
+        Format an order into a receipt.
+        """
+        sub_total = self.sub_total_cost()
+        print(ORDER_RECEIPT.format(
+            id=self.id,
+            total_due=format(currency(self.total_cost()), '>33'),
+            subtotal=format(currency(sub_total), '>34'),
+            sales_tax=format(
+                currency(self.calculate_sales_tax(sub_total)), '>33'),
+            items='\n'.join(
+                ORDER_RECEIPT_LINE_ITEM.format(
+                    food=format_food_quantity(food, quantity),
+                    cost=format(
+                        currency(self.cost_of_items(food, quantity)),
+                        '>{}'.format(
+                            42 - len(format_food_quantity(food, quantity)))))
+                for food, quantity in self
+            )
+        ))
+
+    def remove_order_item(self, *food):
+        """
+        Remove food from order if contained.
+
+        Inform the user if the item had not been added to their order.
+        """
         food = ' '.join(food)
-    if food not in MENU:
-        print(MENU_ERROR.format(food))
-        return
+        if food not in self:
+            print('{} not in order'.format(food))
+        else:
+            self[food] -= 1
+            print('cost of order so far in {}'.format(
+                currency(self.total_cost())))
+            if self[food] == 0:
+                self._order.pop(food)
 
-    if quantity <= 0:
-        print('That is not a valid quantity!')
-        return
-    check_quantity = order.get(food, 0) + quantity
+    def add_order_item(self, *food):
+        """
+        Add a food item to an order or inform user that it is not available.
+        """
+        try:
+            quantity = int(food[-1])
+            food = ' '.join(food[:-1])
+        except(ValueError):
+            quantity = 1
+            food = ' '.join(food)
+        if food not in MENU:
+            print(MENU_ERROR.format(food))
+            return
 
-    if MENU[food]['quantity'] < check_quantity:
-        print('That is too many! Not enough in stock.')
-        return
+        if quantity <= 0:
+            print('That is not a valid quantity!')
+            return
+        check_quantity = self._order.get(food, 0) + quantity
 
-    order[food] = check_quantity
-    print(ORDER_RESPONSE.format(order[food], food))
-    print('cost of order so far in {}'.format(currency(total_cost(order))))
+        if MENU[food]['quantity'] < check_quantity:
+            print('That is too many! Not enough in stock.')
+            return
 
+        self[food] = check_quantity
+        print(ORDER_RESPONSE.format(self[food], food))
+        print('cost of order so far in {}'.format(currency(self.total_cost())))
 
-def handle_user_action(order, user_request):
-    """
-    Dispatch to handler functions based on user action verb.
-    """
-    action, *options = user_request.split()
-    if action == 'order':
-        receipt_display(order)
-    elif action == 'menu':
-        menu_display()
-    elif action == 'remove':
-        remove_order_item(order, *options)
-    elif action in CATEGORY_VIEW:
-        category_display(user_request)
-    else:
-        add_order_item(order, action, *options)
+    def handle_user_action(self, user_request):
+        """
+        Dispatch to handler functions based on user action verb.
+        """
+        action, *options = user_request.split()
+        if action == 'order':
+            self.receipt_display()
+        elif action == 'menu':
+            menu_display()
+        elif action == 'remove':
+            self.remove_order_item(*options)
+        elif action in CATEGORY_VIEW:
+            category_display(user_request)
+        else:
+            self.add_order_item(action, *options)
 
+    def handle_input(self, user_request):
+        """
+        Handle input.
 
-def handle_input(order, user_request):
-    """
-    Handle input.
-
-    false for exit, true otherwise
-    """
-    user_request = user_request.strip().lower()
-    if not user_request:
+        false for exit, true otherwise
+        """
+        user_request = user_request.strip().lower()
+        if not user_request:
+            return True
+        elif user_request == 'quit':
+            return False
+        self.handle_user_action(user_request)
         return True
-    elif user_request == 'quit':
-        return False
-    handle_user_action(order, user_request)
-    return True
 
+    @staticmethod
+    def cost_of_items(food, quantity):
+        """
+        Retrieve the current price for a menu item and quantity.
+        """
+        return MENU[food]['price'] * quantity
 
-def cost_of_items(food, quantity):
-    """
-    Retrieve the current price for a menu item and quantity.
-    """
-    return MENU[food]['price'] * quantity
+    def sub_total_cost(self):
+        """
+        Gather costs of idividual line items into a subtotal.
+        """
+        cost = 0
+        for food, quantity in self:
+            cost += self.cost_of_items(food, quantity)
+        return cost
 
+    @staticmethod
+    def calculate_sales_tax(cost):
+        """
+        Calculate additional cost from sales tax.
+        """
+        return math.ceil(cost * SALES_TAX) / 100
 
-def sub_total_cost(order):
-    """
-    Gather costs of idividual line items into a subtotal.
-    """
-    cost = 0
-    for food, quantity in order.items():
-        if food == 'id':
-            continue
-        cost += cost_of_items(food, quantity)
-    return cost
-
-
-def calculate_sales_tax(cost):
-    """
-    Calculate additional cost from sales tax.
-    """
-    return math.ceil(cost * SALES_TAX) / 100
-
-
-def total_cost(order):
-    """
-    Calculate cost of order with sales tax added.
-    """
-    sub_total = sub_total_cost(order)
-    sales_tax = calculate_sales_tax(sub_total)
-    return sub_total + sales_tax
-
-
-def generate_blank_order_with_id():
-    """
-    Create a new order with needed metadata.
-    """
-    return {'id': uuid4()}
+    def total_cost(self):
+        """
+        Calculate cost of order with sales tax added.
+        """
+        sub_total = self.sub_total_cost()
+        sales_tax = self.calculate_sales_tax(sub_total)
+        return sub_total + sales_tax
 
 
 def load_menu():
@@ -245,8 +257,8 @@ def main():
     """main."""
     load_menu()
     menu_display()
-    order = generate_blank_order_with_id()
-    while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
+    order = Order()
+    while order.handle_input(user_request=clean_input(USER_INPUT_REQUEST)):
         pass
 
 
