@@ -2,183 +2,21 @@
 
 import math
 
+from csv import DictReader
 from locale import LC_ALL, currency, setlocale
 from uuid import uuid4
 
+from default.menu import (
+    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, MENU_ERROR, ORDER_RECEIPT,
+    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, SALES_TAX, USER_INPUT_REQUEST,
+    create_catgory_view)
+
 setlocale(LC_ALL, '')
 
-INSTRUCTIONS_HEADER = '''
-**************************************
-**    Welcome to the Snakes Cafe!   **
-**    Please see our menu below.    **
-**
-** To quit at any time, type "quit" **
-**************************************
-'''
 
-USER_INPUT_REQUEST = '''
-***********************************
-** What would you like to order? **
-***********************************
+REQUEST_MENU_FILE = '''
+Would you like to provide a file for loading a menu?
 > '''
-
-ORDER_RECEIPT = '''
-*******************************************
-The Snakes Cafe
-"Eatability Counts"
-
-Order #{id}
-===========================================
-{items}
--------------------------------------------
-Subtotal {subtotal}
-Sales Tax {sales_tax}
----------
-Total Due {total_due}
-*******************************************
-'''
-
-ORDER_RECEIPT_LINE_ITEM = '{food} {cost}'
-
-MENU_ERROR = '''
-***********************************
-** {} is not in menu **
-***********************************
-'''
-
-ORDER_RESPONSE = '''
-** {} order of {} have been added to your meal **
-'''
-
-MENU = {
-    'wings': {
-        'categories': 'appetizers',
-        'price': 7.77
-    },
-    'cookies': {
-        'categories': 'appetizers',
-        'price': 100.0
-    },
-    'spring rolls': {
-        'categories': 'appetizers',
-        'price': 4.0
-    },
-    'fries': {
-        'categories': 'appetizers',
-        'price': 1.50
-    },
-    'calimari': {
-        'categories': 'appetizers',
-        'price': 3.45
-    },
-    'gyoza': {
-        'categories': 'appetizers',
-        'price': 6.78
-    },
-    'salmon': {
-        'categories': 'entrees',
-        'price': 16.0
-    },
-    'steak': {
-        'categories': 'entrees',
-        'price': 20.0
-    },
-    'meat tornado': {
-        'categories': 'entrees',
-        'price': 12.01
-    },
-    'spaghetti': {
-        'categories': 'entrees',
-        'price': 12.34
-    },
-    'tofu': {
-        'categories': 'entrees',
-        'price': 8.0
-    },
-    'stir fry': {
-        'categories': 'entrees',
-        'price': 10
-    },
-    'ice cream': {
-        'categories': 'desserts',
-        'price': 5.00
-    },
-    'cake': {
-        'categories': 'desserts',
-        'price': 3.99
-    },
-    'whole pie': {
-        'categories': 'desserts',
-        'price': 30.0
-    },
-    'tiramisu': {
-        'categories': 'desserts',
-        'price': 5.01
-    },
-    'mixed fruit': {
-        'categories': 'desserts',
-        'price': 0.0
-    },
-    'half a cookie': {
-        'categories': 'desserts',
-        'price': 0.50
-    },
-    'coffee': {
-        'categories': 'drinks',
-        'price': 0.85
-    },
-    'tea': {
-        'categories': 'drinks',
-        'price': 0.60
-    },
-    'blood of the innocent': {
-        'categories': 'drinks',
-        'price': 666.66
-    },
-    'orange juice': {
-        'categories': 'drinks',
-        'price': 2
-    },
-    'smoothie': {
-        'categories': 'drinks',
-        'price': 3.5
-    },
-    'ice cream float': {
-        'categories': 'drinks',
-        'price': 3.25
-    },
-    'coleslaw': {
-        'categories': 'sides',
-        'price': 1.00
-    },
-    '5 cheese sticks': {
-        'categories': 'sides',
-        'price': 2.00
-    },
-    'garlic bread': {
-        'categories': 'sides',
-        'price': 2.22
-    },
-    'chips with avocado dip': {
-        'categories': 'sides',
-        'price': 1.32
-    },
-    'salad': {
-        'categories': 'sides',
-        'price': 0.75
-    },
-    'fondue': {
-        'categories': 'sides',
-        'price': 4.80
-    },
-}
-
-CATEGORY_VIEW = {}
-for food, details in MENU.items():
-    categories = details['categories']
-    CATEGORY_VIEW.setdefault(categories, []).append(food)
-
-SALES_TAX = 10.1
 
 
 def category_display(category):
@@ -249,17 +87,35 @@ def remove_order_item(order, *food):
         print('{} not in order'.format(food))
     else:
         order[food] -= 1
+        print('cost of order so far in {}'.format(currency(total_cost(order))))
+        if order[food] == 0:
+            order.pop(food)
 
 
 def add_order_item(order, *food):
     """
     Add a food item to an order or inform user that it is not available.
     """
-    food = ' '.join(food)
+    try:
+        quantity = int(food[-1])
+        food = ' '.join(food[:-1])
+    except(ValueError):
+        quantity = 1
+        food = ' '.join(food)
     if food not in MENU:
         print(MENU_ERROR.format(food))
         return
-    order[food] = order.get(food, 0) + 1
+
+    if quantity <= 0:
+        print('That is not a valid quantity!')
+        return
+    check_quantity = order.get(food, 0) + quantity
+
+    if MENU[food]['quantity'] < check_quantity:
+        print('That is too many! Not enough in stock.')
+        return
+
+    order[food] = check_quantity
     print(ORDER_RESPONSE.format(order[food], food))
     print('cost of order so far in {}'.format(currency(total_cost(order))))
 
@@ -283,7 +139,8 @@ def handle_user_action(order, user_request):
 
 def handle_input(order, user_request):
     """
-    function handles input
+    Handle input.
+
     false for exit, true otherwise
     """
     user_request = user_request.strip().lower()
@@ -337,6 +194,43 @@ def generate_blank_order_with_id():
     return {'id': uuid4()}
 
 
+def load_menu():
+    global CATEGORY_VIEW, MENU
+    file_name = clean_input(REQUEST_MENU_FILE)
+    if not file_name:
+        return
+    try:
+        with open(file_name) as istream:
+            csv_content = istream.read()
+    except OSError:
+        print('File {} could not be found'.format(file_name))
+        return
+    menu = {}
+    for row in DictReader(csv_content.splitlines(), fieldnames=[
+            'name', 'categories', 'price', 'quantity']):
+        try:
+            price = float(row['price'].strip())
+        except ValueError:
+            print('found ({}) invalid number price'.format(row['price']))
+            return
+        if row['quantity'] is None:
+            quantity = 1
+        else:
+            try:
+                quantity = int(row['quantity'].strip())
+            except ValueError:
+                print('found ({}) invalid integer quantity'.format(
+                    row['quantity']))
+                return
+        menu[row['name'].strip()] = {
+            'categories': row['categories'].strip(),
+            'price': price,
+            'quantity': quantity,
+        }
+    MENU = menu
+    CATEGORY_VIEW = create_catgory_view(MENU)
+
+
 def clean_input(*args):
     """
     Handle standard input exceptions and get input line.
@@ -349,6 +243,7 @@ def clean_input(*args):
 
 def main():
     """main."""
+    load_menu()
     menu_display()
     order = generate_blank_order_with_id()
     while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
