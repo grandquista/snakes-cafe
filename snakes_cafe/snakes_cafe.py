@@ -126,7 +126,7 @@ class Order:
             )
         ), file=ostream)
 
-    def remove_item(self, food):
+    def remove_item(self, food, quantity=1):
         """
         Remove food from order if contained.
 
@@ -135,10 +135,10 @@ class Order:
         if food not in self:
             print('{} not in order'.format(food))
         else:
-            self[food] -= 1
-            print('cost of order so far in {}'.format(
+            self[food] -= quantity
+            print('cost of order so far is {}'.format(
                 currency(self.total_cost())))
-            if self[food] == 0:
+            if self[food] <= 0:
                 self._order.pop(food)
 
     def add_item(self, food, quantity=1):
@@ -161,6 +161,15 @@ class Order:
         print(ORDER_RESPONSE.format(self[food], food))
         print('cost of order so far in {}'.format(currency(self.total_cost())))
 
+    @staticmethod
+    def _handle_action_with_quantity(method, action):
+        try:
+            quantity = int(action[-1])
+        except ValueError:
+            method(' '.join(action))
+        else:
+            method(' '.join(action[:-1]), quantity)
+
     def handle_user_action(self, user_request):
         """
         Dispatch to handler functions based on user action verb.
@@ -171,16 +180,11 @@ class Order:
         elif action[0] == 'menu':
             self.menu_display()
         elif action[0] == 'remove':
-            self.remove_item(' '.join(action[1:]))
+            self._handle_action_with_quantity(self.remove_item, action[1:])
         elif action[0] in CATEGORY_VIEW:
             self.category_display(user_request)
         else:
-            try:
-                quantity = int(action[-1])
-            except ValueError:
-                self.add_item(' '.join(action))
-            else:
-                self.add_item(' '.join(action[:-1]), quantity)
+            self._handle_action_with_quantity(self.add_item, action)
 
     def handle_input(self, user_request):
         """
