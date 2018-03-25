@@ -8,49 +8,10 @@ from uuid import uuid4
 
 from default.menu import (
     CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, MENU_ERROR, ORDER_RECEIPT,
-    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, SALES_TAX, USER_INPUT_REQUEST,
-    create_catgory_view)
+    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, REQUEST_MENU_FILE, SALES_TAX,
+    USER_INPUT_REQUEST, create_catgory_view)
 
 setlocale(LC_ALL, '')
-
-
-REQUEST_MENU_FILE = '''
-Would you like to provide a file for loading a menu?
-> '''
-
-
-def category_display(category):
-    """
-    Display a single category with possible menu items.
-
-    See sample output below
-
-    Category
-    --------
-    Food1
-    Food2
-    """
-    print(category.title())
-    print('-' * len(category))
-    for food in CATEGORY_VIEW[category]:
-        print(food.title())
-
-
-def menu_display():
-    """
-    Provide a menu for users.
-    """
-    print(INSTRUCTIONS_HEADER)
-    for category in sorted(CATEGORY_VIEW.keys()):
-        print()
-        category_display(category)
-
-
-def format_food_quantity(food, quantity):
-    """
-    Format beginning of receipt line item.
-    """
-    return '{} x{}'.format(food, quantity)
 
 
 class Order:
@@ -79,6 +40,39 @@ class Order:
     def __contains__(self, key):
         return key in self._order
 
+    @staticmethod
+    def category_display(category):
+        """
+        Display a single category with possible menu items.
+
+        See sample output below
+
+        Category
+        --------
+        Food1
+        Food2
+        """
+        print(category.title())
+        print('-' * len(category))
+        for food in CATEGORY_VIEW[category]:
+            print(food.title())
+
+    def menu_display(self):
+        """
+        Provide a menu for users.
+        """
+        print(INSTRUCTIONS_HEADER)
+        for category in sorted(CATEGORY_VIEW.keys()):
+            print()
+            self.category_display(category)
+
+    @staticmethod
+    def format_food_quantity(food, quantity):
+        """
+        Format beginning of receipt line item.
+        """
+        return '{} x{}'.format(food, quantity)
+
     def receipt_display(self):
         """
         Format an order into a receipt.
@@ -92,11 +86,11 @@ class Order:
                 currency(self.calculate_sales_tax(sub_total)), '>33'),
             items='\n'.join(
                 ORDER_RECEIPT_LINE_ITEM.format(
-                    food=format_food_quantity(food, quantity),
+                    food=self.format_food_quantity(food, quantity),
                     cost=format(
                         currency(self.cost_of_items(food, quantity)),
-                        '>{}'.format(
-                            42 - len(format_food_quantity(food, quantity)))))
+                        '>{}'.format(42 - len(
+                            self.format_food_quantity(food, quantity)))))
                 for food, quantity in self
             )
         ))
@@ -152,11 +146,11 @@ class Order:
         if action == 'order':
             self.receipt_display()
         elif action == 'menu':
-            menu_display()
+            self.menu_display()
         elif action == 'remove':
             self.remove_order_item(*options)
         elif action in CATEGORY_VIEW:
-            category_display(user_request)
+            self.category_display(user_request)
         else:
             self.add_order_item(action, *options)
 
@@ -205,61 +199,63 @@ class Order:
         sales_tax = self.calculate_sales_tax(sub_total)
         return sub_total + sales_tax
 
-
-def load_menu():
-    global CATEGORY_VIEW, MENU
-    file_name = clean_input(REQUEST_MENU_FILE)
-    if not file_name:
-        return
-    try:
-        with open(file_name) as istream:
-            csv_content = istream.read()
-    except OSError:
-        print('File {} could not be found'.format(file_name))
-        return
-    menu = {}
-    for row in DictReader(csv_content.splitlines(), fieldnames=[
-            'name', 'categories', 'price', 'quantity']):
-        try:
-            price = float(row['price'].strip())
-        except ValueError:
-            print('found ({}) invalid number price'.format(row['price']))
+    def load_menu(self):
+        global CATEGORY_VIEW, MENU
+        file_name = self.clean_input(REQUEST_MENU_FILE)
+        if not file_name:
             return
-        if row['quantity'] is None:
-            quantity = 1
-        else:
+        try:
+            with open(file_name) as istream:
+                csv_content = istream.read()
+        except OSError:
+            print('File {} could not be found'.format(file_name))
+            return
+        menu = {}
+        for row in DictReader(csv_content.splitlines(), fieldnames=[
+                'name', 'categories', 'price', 'quantity']):
             try:
-                quantity = int(row['quantity'].strip())
+                price = float(row['price'].strip())
             except ValueError:
-                print('found ({}) invalid integer quantity'.format(
-                    row['quantity']))
+                print('found ({}) invalid number price'.format(row['price']))
                 return
-        menu[row['name'].strip()] = {
-            'categories': row['categories'].strip(),
-            'price': price,
-            'quantity': quantity,
-        }
-    MENU = menu
-    CATEGORY_VIEW = create_catgory_view(MENU)
+            if row['quantity'] is None:
+                quantity = 1
+            else:
+                try:
+                    quantity = int(row['quantity'].strip())
+                except ValueError:
+                    print('found ({}) invalid integer quantity'.format(
+                        row['quantity']))
+                    return
+            menu[row['name'].strip()] = {
+                'categories': row['categories'].strip(),
+                'price': price,
+                'quantity': quantity,
+            }
+        MENU = menu
+        CATEGORY_VIEW = create_catgory_view(MENU)
 
+    @staticmethod
+    def clean_input(*args):
+        """
+        Handle standard input exceptions and get input line.
+        """
+        try:
+            return input(*args)
+        except EOFError:
+            return 'quit'
 
-def clean_input(*args):
-    """
-    Handle standard input exceptions and get input line.
-    """
-    try:
-        return input(*args)
-    except EOFError:
-        return 'quit'
+    def process_user_order(self):
+        self.load_menu()
+        self.menu_display()
+        while self.handle_input(
+                user_request=self.clean_input(USER_INPUT_REQUEST)):
+            pass
 
 
 def main():
     """main."""
-    load_menu()
-    menu_display()
-    order = Order()
-    while order.handle_input(user_request=clean_input(USER_INPUT_REQUEST)):
-        pass
+    Order().process_user_order()
 
 
 if __name__ == '__main__':
