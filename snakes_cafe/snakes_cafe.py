@@ -3,6 +3,7 @@
 import math
 
 from csv import DictReader
+from io import StringIO
 from locale import LC_ALL, currency, setlocale
 from sys import stdout
 from uuid import uuid4
@@ -22,6 +23,28 @@ class Order:
         """
         self.id = uuid4()
         self._order = {}
+
+    def __repr__(self):
+        """
+        Represent an order in the following form.
+
+        '<Order #{id} | Items: {item_count} | Total: {order_cost}>'.
+        """
+        return f'''<Order #{
+            self.id
+        } | Items: {
+            len(self)
+        } | Total: '{
+            currency(self.total_cost())
+        }'>'''
+
+    def __str__(self):
+        """
+        Format an order into a receipt for printing.
+        """
+        with StringIO as ostream:
+            self.display_order(ostream)
+            return ostream.getvalue()
 
     def __getitem__(self, key):
         return self._order[key]
@@ -76,7 +99,7 @@ class Order:
 
     def print_receipt(self):
         """
-        Format an order into a receipt.
+        Format an order into a receipt file.
         """
         with open(f'order-{ self.id }.txt') as ostream:
             self.display_order(ostream)
