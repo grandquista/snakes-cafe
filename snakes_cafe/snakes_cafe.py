@@ -111,22 +111,15 @@ class Order:
             if self[food] == 0:
                 self._order.pop(food)
 
-    def add_order_item(self, *food):
+    def add_item(self, food, quantity=1):
         """
         Add a food item to an order or inform user that it is not available.
         """
-        try:
-            quantity = int(food[-1])
-            food = ' '.join(food[:-1])
-        except(ValueError):
-            quantity = 1
-            food = ' '.join(food)
-        if food not in MENU:
-            print(MENU_ERROR.format(food))
-            return
-
         if quantity <= 0:
             print('That is not a valid quantity!')
+            return
+        if food not in MENU:
+            print(MENU_ERROR.format(food))
             return
         check_quantity = self._order.get(food, 0) + quantity
 
@@ -142,17 +135,22 @@ class Order:
         """
         Dispatch to handler functions based on user action verb.
         """
-        action, *options = user_request.split()
-        if action == 'order':
+        action = user_request.split()
+        if action[0] == 'order':
             self.receipt_display()
-        elif action == 'menu':
+        elif action[0] == 'menu':
             self.menu_display()
-        elif action == 'remove':
-            self.remove_order_item(*options)
-        elif action in CATEGORY_VIEW:
+        elif action[0] == 'remove':
+            self.remove_order_item(*action[1:])
+        elif action[0] in CATEGORY_VIEW:
             self.category_display(user_request)
         else:
-            self.add_order_item(action, *options)
+            try:
+                quantity = int(action[-1])
+            except ValueError:
+                self.add_item(' '.join(action))
+            else:
+                self.add_item(' '.join(action[:-1]), quantity)
 
     def handle_input(self, user_request):
         """
