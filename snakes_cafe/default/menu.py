@@ -37,16 +37,6 @@ Total Due {total_due}
 
 ORDER_RECEIPT_LINE_ITEM = '{food} {cost}'
 
-MENU_ERROR = '''
-***********************************
-** {} is not in menu **
-***********************************
-'''
-
-ORDER_RESPONSE = '''
-** {} order of {} have been added to your meal **
-'''
-
 REQUEST_MENU_FILE = '''
 Would you like to provide a file for loading a menu?
 > '''

@@ -9,11 +9,17 @@ from sys import stdout
 from uuid import uuid4
 
 from default.menu import (
-    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, MENU_ERROR, ORDER_RECEIPT,
-    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, REQUEST_MENU_FILE, SALES_TAX,
+    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, ORDER_RECEIPT,
+    ORDER_RECEIPT_LINE_ITEM, REQUEST_MENU_FILE, SALES_TAX,
     USER_INPUT_REQUEST, create_catgory_view)
 
 setlocale(LC_ALL, '')
+
+
+class SnakesCafeError(Exception):
+    """
+    Base exception for library errors.
+    """
 
 
 class Order:
@@ -65,7 +71,7 @@ class Order:
         return key in self._order
 
     @staticmethod
-    def category_display(category):
+    def category_display(category, ostream=stdout):
         """
         Display a single category with possible menu items.
 
@@ -76,19 +82,19 @@ class Order:
         Food1
         Food2
         """
-        print(category.title())
-        print('-' * len(category))
+        print(category.title(), file=ostream)
+        print('-' * len(category), file=ostream)
         for food in CATEGORY_VIEW[category]:
-            print(food.title())
+            print(food.title(), file=ostream)
 
-    def menu_display(self):
+    def menu_display(self, ostream=stdout):
         """
         Provide a menu for users.
         """
-        print(INSTRUCTIONS_HEADER)
+        print(INSTRUCTIONS_HEADER, file=ostream)
         for category in sorted(CATEGORY_VIEW.keys()):
-            print()
-            self.category_display(category)
+            print(file=ostream)
+            self.category_display(category, ostream)
 
     @staticmethod
     def format_food_quantity(food, quantity):
@@ -133,42 +139,40 @@ class Order:
         Inform the user if the item had not been added to their order.
         """
         if food not in self:
-            print('{} not in order'.format(food))
-        else:
-            self[food] -= quantity
-            print('cost of order so far is {}'.format(
-                currency(self.total_cost())))
-            if self[food] <= 0:
-                self._order.pop(food)
+            return (food, 'not in order')
+        self[food] -= quantity
+        if self[food] <= 0:
+            self._order.pop(food)
+        return ('cost of order is', currency(self.total_cost()))
 
     def add_item(self, food, quantity=1):
         """
         Add a food item to an order or inform user that it is not available.
         """
-        if quantity <= 0:
-            print('That is not a valid quantity!')
-            return
         if food not in MENU:
-            print(MENU_ERROR.format(food))
-            return
+            return (food, 'is not in menu')
         check_quantity = self._order.get(food, 0) + quantity
 
         if MENU[food]['quantity'] < check_quantity:
-            print('That is too many! Not enough in stock.')
-            return
+            return (check_quantity, 'is too many! Not enough in stock.')
 
         self[food] = check_quantity
-        print(ORDER_RESPONSE.format(self[food], food))
-        print('cost of order so far in {}'.format(currency(self.total_cost())))
+        return (
+            self[food],
+            'order of',
+            food,
+            'have been added to your meal\ncost of order is',
+            currency(self.total_cost()))
 
     @staticmethod
     def _handle_action_with_quantity(method, action):
         try:
             quantity = int(action[-1])
+            if quantity <= 0:
+                return (action[-1], 'is not a valid quantity!')
         except ValueError:
-            method(' '.join(action))
-        else:
-            method(' '.join(action[:-1]), quantity)
+            return method(' '.join(action))
+        return method(' '.join(action[:-1]), quantity)
 
     def handle_user_action(self, user_request):
         """
@@ -176,17 +180,17 @@ class Order:
         """
         action = user_request.split()
         if action[0] == 'order':
-            self.display_order()
-        elif action[0] == 'menu':
-            self.menu_display()
-        elif action[0] == 'remove':
-            self._handle_action_with_quantity(self.remove_item, action[1:])
-        elif action[0] in CATEGORY_VIEW:
-            self.category_display(user_request)
-        else:
-            self._handle_action_with_quantity(self.add_item, action)
+            return self.display_order()
+        if action[0] == 'menu':
+            return self.menu_display()
+        if action[0] == 'remove':
+            return self._handle_action_with_quantity(
+                self.remove_item, action[1:])
+        if action[0] in CATEGORY_VIEW:
+            return self.category_display(user_request)
+        return self._handle_action_with_quantity(self.add_item, action)
 
-    def handle_input(self, user_request):
+    def handle_input(self, user_request, ostream=stdout):
         """
         Handle input.
 
@@ -194,11 +198,15 @@ class Order:
         """
         user_request = user_request.strip().lower()
         if not user_request:
-            return True
-        elif user_request == 'quit':
             return False
-        self.handle_user_action(user_request)
-        return True
+        elif user_request == 'quit':
+            return True
+        response = self.handle_user_action(user_request)
+        if callable(response[0]):
+            response[0](ostream)
+        else:
+            print(*response, file=ostream)
+        return False
 
     @staticmethod
     def cost_of_items(food, quantity):
@@ -240,7 +248,7 @@ class Order:
             with open(file_name) as istream:
                 csv_content = istream.read()
         except OSError:
-            print('File {} could not be found'.format(file_name))
+            print('File', file_name, 'could not be found')
             return
         menu = {}
         for row in DictReader(csv_content.splitlines(), fieldnames=[
@@ -248,7 +256,7 @@ class Order:
             try:
                 price = float(row['price'].strip())
             except ValueError:
-                print('found ({}) invalid number price'.format(row['price']))
+                print('found (', row, ') with invalid price')
                 return
             if row['quantity'] is None:
                 quantity = 1
@@ -256,8 +264,7 @@ class Order:
                 try:
                     quantity = int(row['quantity'].strip())
                 except ValueError:
-                    print('found ({}) invalid integer quantity'.format(
-                        row['quantity']))
+                    print('found (', row, ') with invalid quantity')
                     return
             menu[row['name'].strip()] = {
                 'categories': row['categories'].strip(),
@@ -277,12 +284,14 @@ class Order:
         except EOFError:
             return 'quit'
 
-    def process_user_order(self):
-        self.load_menu()
-        self.menu_display()
-        while self.handle_input(
-                user_request=self.clean_input(USER_INPUT_REQUEST)):
-            pass
+    def process_user_order(self, ostream=stdout):
+        self.load_menu(ostream)
+        self.menu_display(ostream)
+        should_exit = False
+        while should_exit:
+            should_exit = self.handle_input(
+                self.clean_input(USER_INPUT_REQUEST),
+                ostream)
 
 
 def main():

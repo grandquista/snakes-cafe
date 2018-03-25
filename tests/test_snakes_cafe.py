@@ -9,20 +9,20 @@ def order():
 
 
 def test_handle_input_valid_menu_order_returns_true(order):
-    assert order.handle_input('whole pie')
+    assert not order.handle_input('whole pie')
 
 
 def test_handle_input_quit_returns_false(order):
-    assert not order.handle_input('quit')
+    assert order.handle_input('quit')
 
 
 def test_handle_input_not_case_sensitive(order):
-    assert order.handle_input('WhOlE PiE')
+    assert not order.handle_input('WhOlE PiE')
     assert 'whole pie' in order
 
 
 def test_handle_input_takes_item_and_quantity(order):
-    assert order.handle_input('whole pie 5')
+    assert not order.handle_input('whole pie 5')
     assert 'whole pie' in order
     assert order['whole pie'] == 5
 
@@ -142,7 +142,7 @@ def test_total_cost_3_tofu(order):
 
 
 def test_add_item_quantity_cannot_be_negative(order):
-    order.add_item('tea', -1)
+    order.handle_user_action('tea -1')
     assert 'tea' not in order
 
 
