@@ -4,6 +4,7 @@ import math
 
 from csv import DictReader
 from locale import LC_ALL, currency, setlocale
+from sys import stdout
 from uuid import uuid4
 
 from default.menu import (
@@ -73,9 +74,16 @@ class Order:
         """
         return '{} x{}'.format(food, quantity)
 
-    def receipt_display(self):
+    def print_receipt(self):
         """
         Format an order into a receipt.
+        """
+        with open(f'order-{ self.id }.txt') as ostream:
+            self.display_order(ostream)
+
+    def display_order(self, ostream=stdout):
+        """
+        Format beginning of receipt line item.
         """
         sub_total = self.sub_total_cost()
         print(ORDER_RECEIPT.format(
@@ -93,7 +101,7 @@ class Order:
                             self.format_food_quantity(food, quantity)))))
                 for food, quantity in self
             )
-        ))
+        ), file=ostream)
 
     def remove_item(self, food):
         """
@@ -136,7 +144,7 @@ class Order:
         """
         action = user_request.split()
         if action[0] == 'order':
-            self.receipt_display()
+            self.display_order()
         elif action[0] == 'menu':
             self.menu_display()
         elif action[0] == 'remove':
