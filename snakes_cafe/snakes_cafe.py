@@ -287,11 +287,10 @@ class Order:
     def process_user_order(self, ostream=stdout):
         self.load_menu(ostream)
         self.menu_display(ostream)
-        should_exit = False
-        while should_exit:
-            should_exit = self.handle_input(
+        while not self.handle_input(
                 self.clean_input(USER_INPUT_REQUEST),
-                ostream)
+                ostream):
+            pass
 
 
 def main():
