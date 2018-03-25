@@ -95,13 +95,12 @@ class Order:
             )
         ))
 
-    def remove_order_item(self, *food):
+    def remove_item(self, food):
         """
         Remove food from order if contained.
 
         Inform the user if the item had not been added to their order.
         """
-        food = ' '.join(food)
         if food not in self:
             print('{} not in order'.format(food))
         else:
@@ -141,7 +140,7 @@ class Order:
         elif action[0] == 'menu':
             self.menu_display()
         elif action[0] == 'remove':
-            self.remove_order_item(*action[1:])
+            self.remove_item(' '.join(action[1:]))
         elif action[0] in CATEGORY_VIEW:
             self.category_display(user_request)
         else:

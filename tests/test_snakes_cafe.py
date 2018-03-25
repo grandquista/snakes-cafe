@@ -56,22 +56,22 @@ def test_format_food_quantity_1(order):
     assert order.format_food_quantity('hummus', 1) == 'hummus x1'
 
 
-def test_remove_order_item_in_order(order):
+def test_remove_item_in_order(order):
     order.add_item('hummus', 6)
-    order.remove_order_item('hummus')
+    order.remove_item('hummus')
     assert order['hummus'] == 5
 
 
-def test_remove_order_item_not_in_order(order):
+def test_remove_item_not_in_order(order):
     order.add_item('hummus', 6)
-    order.remove_order_item('tofu')
+    order.remove_item('tofu')
     assert order['hummus'] == 6
 
 
-def test_remove_order_item_erases_entry(order):
+def test_remove_item_erases_entry(order):
     order.add_item('hummus', 2)
-    order.remove_order_item('hummus')
-    order.remove_order_item('hummus')
+    order.remove_item('hummus')
+    order.remove_item('hummus')
     assert 'hummus' not in order
 
 
