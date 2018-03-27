@@ -19,14 +19,16 @@ USER_INPUT_REQUEST = '''
 ****************************************************************
 > '''
 
-ORDER_RECEIPT = '''
+ORDER_RECEIPT_HEAD = '''
 *******************************************
 The Snakes Cafe
 "Eatability Counts"
 
 Order #{id}
 ===========================================
-{items}
+'''
+
+ORDER_RECEIPT_TAIL = '''
 -------------------------------------------
 Subtotal {subtotal}
 Sales Tax {sales_tax}
@@ -34,8 +36,6 @@ Sales Tax {sales_tax}
 Total Due {total_due}
 *******************************************
 '''
-
-ORDER_RECEIPT_LINE_ITEM = '{food} {cost}'
 
 REQUEST_MENU_FILE = '''
 Would you like to provide a file for loading a menu?

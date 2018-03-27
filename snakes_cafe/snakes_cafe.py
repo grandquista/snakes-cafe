@@ -9,8 +9,8 @@ from sys import stdout
 from uuid import uuid4
 
 from default.menu import (
-    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, ORDER_RECEIPT,
-    ORDER_RECEIPT_LINE_ITEM, REQUEST_MENU_FILE, SALES_TAX,
+    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, ORDER_RECEIPT_HEAD,
+    ORDER_RECEIPT_TAIL, REQUEST_MENU_FILE, SALES_TAX,
     USER_INPUT_REQUEST, create_catgory_view)
 
 setlocale(LC_ALL, '')
@@ -96,13 +96,6 @@ class Order:
             print(file=ostream)
             self.category_display(category, ostream)
 
-    @staticmethod
-    def format_food_quantity(food, quantity):
-        """
-        Format beginning of receipt line item.
-        """
-        return '{} x{}'.format(food, quantity)
-
     def print_receipt(self):
         """
         Format an order into a receipt file.
@@ -112,24 +105,21 @@ class Order:
 
     def display_order(self, ostream=stdout):
         """
-        Format beginning of receipt line item.
+        Format an order and output to stream or stdout.
         """
         sub_total = self.sub_total_cost()
-        print(ORDER_RECEIPT.format(
-            id=self.id,
+        print(ORDER_RECEIPT_HEAD.format(id=self.id), file=ostream)
+        for food, quantity in self:
+            print(
+                format(food, '<20'),
+                format('x{}'.format(quantity), '<5'),
+                format(currency(self.cost_of_items(food, quantity)), '>20'),
+                file=ostream)
+        print(ORDER_RECEIPT_TAIL.format(
             total_due=format(currency(self.total_cost()), '>33'),
             subtotal=format(currency(sub_total), '>34'),
             sales_tax=format(
                 currency(self.calculate_sales_tax(sub_total)), '>33'),
-            items='\n'.join(
-                ORDER_RECEIPT_LINE_ITEM.format(
-                    food=self.format_food_quantity(food, quantity),
-                    cost=format(
-                        currency(self.cost_of_items(food, quantity)),
-                        '>{}'.format(42 - len(
-                            self.format_food_quantity(food, quantity)))))
-                for food, quantity in self
-            )
         ), file=ostream)
 
     def remove_item(self, food, quantity=1):
@@ -239,7 +229,7 @@ class Order:
         sales_tax = self.calculate_sales_tax(sub_total)
         return sub_total + sales_tax
 
-    def load_menu(self):
+    def load_menu(self, ostream=stdout):
         global CATEGORY_VIEW, MENU
         file_name = self.clean_input(REQUEST_MENU_FILE)
         if not file_name:
@@ -248,24 +238,24 @@ class Order:
             with open(file_name) as istream:
                 csv_content = istream.read()
         except OSError:
-            print('File', file_name, 'could not be found')
-            return
+            return print('File', file_name, 'could not be found', file=ostream)
         menu = {}
         for row in DictReader(csv_content.splitlines(), fieldnames=[
                 'name', 'categories', 'price', 'quantity']):
             try:
                 price = float(row['price'].strip())
             except ValueError:
-                print('found (', row, ') with invalid price')
-                return
+                return print(
+                    'found (', row, ') with invalid price', file=ostream)
             if row['quantity'] is None:
                 quantity = 1
             else:
                 try:
                     quantity = int(row['quantity'].strip())
                 except ValueError:
-                    print('found (', row, ') with invalid quantity')
-                    return
+                    return print(
+                        'found (', row, ') with invalid quantity',
+                        file=ostream)
             menu[row['name'].strip()] = {
                 'categories': row['categories'].strip(),
                 'price': price,
