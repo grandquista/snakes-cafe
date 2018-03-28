@@ -156,6 +156,8 @@ class Order:
 
     @staticmethod
     def _handle_action_with_quantity(method, action):
+        if not action:
+            return ()
         try:
             quantity = int(action[-1])
             if quantity <= 0:
@@ -170,14 +172,14 @@ class Order:
         """
         action = user_request.split()
         if action[0] == 'order':
-            return self.display_order()
+            return self.display_order
         if action[0] == 'menu':
-            return self.menu_display()
+            return self.menu_display
         if action[0] == 'remove':
             return self._handle_action_with_quantity(
                 self.remove_item, action[1:])
         if action[0] in CATEGORY_VIEW:
-            return self.category_display(user_request)
+            return lambda *args: self.category_display(' '.join(action), *args)
         return self._handle_action_with_quantity(self.add_item, action)
 
     def handle_input(self, user_request, ostream=stdout):
@@ -192,8 +194,8 @@ class Order:
         elif user_request == 'quit':
             return True
         response = self.handle_user_action(user_request)
-        if callable(response[0]):
-            response[0](ostream)
+        if callable(response):
+            response(ostream)
         else:
             print(*response, file=ostream)
         return False
