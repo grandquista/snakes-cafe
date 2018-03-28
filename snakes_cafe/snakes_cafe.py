@@ -232,7 +232,7 @@ class Order:
         sales_tax = self.calculate_sales_tax(sub_total)
         return sub_total + sales_tax
 
-    def load_menu(self, ostream=stdout):
+    def load_menu(self):
         global CATEGORY_VIEW, MENU
         file_name = self.clean_input(REQUEST_MENU_FILE)
         if not file_name:
@@ -241,24 +241,21 @@ class Order:
             with open(file_name) as istream:
                 csv_content = istream.read()
         except OSError:
-            return print('File', file_name, 'could not be found', file=ostream)
+            return ('File', file_name, 'could not be found')
         menu = {}
         for row in DictReader(csv_content.splitlines(), fieldnames=[
                 'name', 'categories', 'price', 'quantity']):
             try:
                 price = float(row['price'].strip())
             except ValueError:
-                return print(
-                    'found (', row, ') with invalid price', file=ostream)
+                return ('found (', row, ') with invalid price')
             if row['quantity'] is None:
                 quantity = 1
             else:
                 try:
                     quantity = int(row['quantity'].strip())
                 except ValueError:
-                    return print(
-                        'found (', row, ') with invalid quantity',
-                        file=ostream)
+                    return ('found (', row, ') with invalid quantity')
             menu[row['name'].strip()] = {
                 'categories': row['categories'].strip(),
                 'price': price,
@@ -278,7 +275,9 @@ class Order:
             return 'quit'
 
     def process_user_order(self, ostream=stdout):
-        self.load_menu(ostream)
+        response = self.load_menu()
+        if response:
+            print(*response, file=ostream)
         self.menu_display(ostream)
         while not self.handle_input(
                 self.clean_input(USER_INPUT_REQUEST),

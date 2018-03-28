@@ -42,6 +42,21 @@ Would you like to provide a file for loading a menu?
 > '''
 
 MENU = {
+    'fish sticks': {
+        'categories': 'appetizers',
+        'price': 7.77,
+        'quantity': 10,
+    },
+    'pizza bites': {
+        'categories': 'appetizers',
+        'price': 100.0,
+        'quantity': 10,
+    },
+    'sushi sampler': {
+        'categories': 'appetizers',
+        'price': 4.0,
+        'quantity': 10,
+    },
     'wings': {
         'categories': 'appetizers',
         'price': 7.77,
@@ -85,6 +100,21 @@ MENU = {
     'gyoza': {
         'categories': 'appetizers',
         'price': 6.78,
+        'quantity': 10,
+    },
+    'cheese pizza': {
+        'categories': 'entrees',
+        'price': 16.0,
+        'quantity': 10,
+    },
+    'hot dogs': {
+        'categories': 'entrees',
+        'price': 20.0,
+        'quantity': 10,
+    },
+    'bratwurst': {
+        'categories': 'entrees',
+        'price': 12.01,
         'quantity': 10,
     },
     'salmon': {
@@ -132,6 +162,21 @@ MENU = {
         'price': 10,
         'quantity': 10,
     },
+    'jello': {
+        'categories': 'desserts',
+        'price': 5.00,
+        'quantity': 10,
+    },
+    'turkish delight': {
+        'categories': 'desserts',
+        'price': 3.99,
+        'quantity': 10,
+    },
+    'candied carrots': {
+        'categories': 'desserts',
+        'price': 30.0,
+        'quantity': 10,
+    },
     'ice cream': {
         'categories': 'desserts',
         'price': 5.00,
@@ -177,6 +222,21 @@ MENU = {
         'price': 0.50,
         'quantity': 10,
     },
+    'cranberry juice': {
+        'categories': 'drinks',
+        'price': 0.85,
+        'quantity': 10,
+    },
+    'almond milk': {
+        'categories': 'drinks',
+        'price': 0.60,
+        'quantity': 10,
+    },
+    'soy milk': {
+        'categories': 'drinks',
+        'price': 666.66,
+        'quantity': 10,
+    },
     'coffee': {
         'categories': 'drinks',
         'price': 0.85,
@@ -220,6 +280,21 @@ MENU = {
     'ice cream float': {
         'categories': 'drinks',
         'price': 3.25,
+        'quantity': 10,
+    },
+    'fried tofu': {
+        'categories': 'sides',
+        'price': 1.00,
+        'quantity': 10,
+    },
+    'grits': {
+        'categories': 'sides',
+        'price': 2.00,
+        'quantity': 10,
+    },
+    'mashed potatoes': {
+        'categories': 'sides',
+        'price': 2.22,
         'quantity': 10,
     },
     'coleslaw': {
