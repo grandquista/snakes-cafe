@@ -111,9 +111,10 @@ class Order:
         print(ORDER_RECEIPT_HEAD.format(id=self.id), file=ostream)
         for food, quantity in self:
             print(
-                format(food, '<20'),
-                format('x{}'.format(quantity), '<5'),
-                format(currency(self.cost_of_items(food, quantity)), '>20'),
+                format(food, '<23'),
+                'x',
+                format(quantity, '<5'),
+                format(currency(self.cost_of_items(food, quantity)), '>11'),
                 file=ostream)
         print(ORDER_RECEIPT_TAIL.format(
             total_due=format(currency(self.total_cost()), '>33'),
