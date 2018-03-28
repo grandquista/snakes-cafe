@@ -6,7 +6,7 @@ from csv import DictReader
 from locale import LC_ALL, currency, setlocale
 from uuid import uuid4
 
-from default.menu import (
+from .default.menu import (
     CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, MENU_ERROR, ORDER_RECEIPT,
     ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, SALES_TAX, USER_INPUT_REQUEST,
     create_catgory_view)

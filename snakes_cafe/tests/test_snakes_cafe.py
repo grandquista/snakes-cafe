@@ -1,4 +1,4 @@
-import snakes_cafe as sc
+from snakes_cafe import snakescafe as sc
 
 
 # handles true
@@ -57,9 +57,9 @@ def test_format_food_quantity_1():
 
 
 def test_remove_order_item_in_order():
-    order = {'food': 6}
-    sc.remove_order_item(order, 'food')
-    assert order['food'] == 5
+    order = {'wings': 6}
+    sc.remove_order_item(order, 'wings')
+    assert order['wings'] == 5
 
 
 def test_remove_order_item_not_in_order():
@@ -69,10 +69,10 @@ def test_remove_order_item_not_in_order():
 
 
 def test_remove_order_item_erases_entry():
-    order = {'food': 2}
-    sc.remove_order_item(order, 'food')
-    sc.remove_order_item(order, 'food')
-    assert 'food' not in order
+    order = {'wings': 2}
+    sc.remove_order_item(order, 'wings')
+    sc.remove_order_item(order, 'wings')
+    assert 'wings' not in order
 
 
 def test_add_order_item_in_menu():
