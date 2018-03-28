@@ -48,14 +48,6 @@ def test_generate_blank_order_with_id(order):
     assert order.id != second_order.id
 
 
-def test_format_food_quantity_3(order):
-    assert order.format_food_quantity('hummus', 3) == 'hummus x3'
-
-
-def test_format_food_quantity_1(order):
-    assert order.format_food_quantity('hummus', 1) == 'hummus x1'
-
-
 def test_remove_item_in_order(order):
     order.add_item('hummus', 6)
     order.remove_item('hummus')
@@ -91,6 +83,16 @@ def test_handle_user_action_remove_item(order):
     assert order['salad'] == 2
 
 
+def test_handle_user_action_remove_multiple_items(order):
+    order.add_item('salad', 3)
+    order.handle_user_action('remove salad 3')
+    assert 'salad' not in order
+
+
+def test_handle_user_action_remove_can_be_called_alone(order):
+    assert isinstance(order.handle_user_action('remove '), tuple)
+
+
 def test_handle_user_action_add_item(order):
     order.add_item('salad', 3)
     order.handle_user_action('salad')
@@ -101,7 +103,7 @@ def test_handle_user_action_display_order(order):
     order.add_item('salad')
     order.add_item('salad')
     order.add_item('salad')
-    order.handle_user_action('order')
+    assert callable(order.handle_user_action('order'))
     assert order['salad'] == 3
 
 
@@ -144,6 +146,10 @@ def test_total_cost_3_tofu(order):
 def test_add_item_quantity_cannot_be_negative(order):
     order.handle_user_action('tea -1')
     assert 'tea' not in order
+
+
+def test_handle_user_action_display_menu(order):
+    assert callable(order.handle_user_action('menu'))
 
 
 def test_add_item_quantity_can_be_positive(order):
