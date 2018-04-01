@@ -7,6 +7,9 @@ hummus, appetizers, 3.0, 10
 fries, appetizers, 4.0, 10
 calimari, appetizers, 5.0, 10
 gyoza, appetizers, 6.0, 10
+cheese balls, appetizers, 100.0, 10
+unicorn bites, appetizers, 11.0, 10
+sake, appetizers, 100.0, 10
 salmon, entrees, 60.0, 10
 steak, entrees, 70.0, 10
 meat tornado, entrees, 10.0, 10
@@ -16,6 +19,9 @@ jambalaya, entrees, 8.0, 10
 spaghetti, entrees, 7.77, 10
 tofu, entrees, 9.11, 10
 stir fry, entrees, 12.0, 10
+make it yourself, entrees, 5.0, 10
+snakes, entrees, 1.0, 10
+more snakes, entrees, 12.0, 10
 ice cream, desserts, 15.0, 10
 cake, desserts, 19.0, 10
 whole pie, desserts, 1.11, 10
@@ -25,6 +31,9 @@ rice pudding, desserts, 5.01, 10
 tiramisu, desserts, 2.02, 10
 mixed fruit, desserts, 3.03, 10
 half a cookie, desserts, 40.0, 10
+rattlesnake, desserts, 50.0, 10
+frozen juice, desserts, 10.0, 10
+i mean it make it yourself, desserts, 20.0, 10
 coffee, drinks, 6.06, 10
 tea, drinks, 2.25, 10
 blood of the innocent, drinks, 666.66, 10
@@ -34,6 +43,9 @@ spring water, drinks, 50.0, 10
 orange juice, drinks, 8.88, 10
 smoothie, drinks, 9.90, 10
 ice cream float, drinks, 11.0, 10
+blood of the guilty, drinks, 111.0, 10
+blood of the average, drinks, 7.0, 10
+blood of the boring, drinks, 2.0, 10
 coleslaw, sides, 12.0, 10
 5 cheese sticks, sides, 4.0, 10
 garlic bread, sides, 3.0, 10
@@ -43,3 +55,6 @@ mixed nuts, sides, 0.5, 10
 chips with avocado dip, sides, 0.8, 10
 salad, sides, 0.9, 10
 fondue, sides, 0.2, 10
+snakes on a plane, sides, 30.3, 10
+side of sides, sides, 0.2, 10
+ginger root, sides, 0.2, 10
