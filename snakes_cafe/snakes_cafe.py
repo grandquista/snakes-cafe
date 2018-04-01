@@ -30,11 +30,19 @@ class Order:
         """
         represent an order
         """
+        # <Order #ba99d8... | Items: 4 | Total: $754.23>
+        return
+        '''<Order #'''{self.id}
+        ''' | Items: '''{len(self)}
+        ''' | Total: '''{currency(self.total_cost())}'>'''
 
     def __str__(self):
         """
         print order
         """
+
+    def __len__(self):
+        return len(self._order)
 
     def category_display(category):
         """
@@ -257,14 +265,18 @@ class Order:
         except EOFError:
             return 'quit'
 
+    # def main():
+    #     """main."""
+    #     load_menu()
+    #     menu_display()
+    #     order = generate_blank_order_with_id()
+    #     while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
+    #         pass
 
-    def main():
-        """main."""
-        load_menu()
-        menu_display()
-        order = generate_blank_order_with_id()
-        while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
-            pass
+
+def main():
+    """main."""
+    Order()
 
 
 if __name__ == '__main__':
