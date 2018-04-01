@@ -3,251 +3,291 @@
 import math
 
 from csv import DictReader
+from io import StringIO
 from locale import LC_ALL, currency, setlocale
+from sys import stdout
 from uuid import uuid4
 
 from default.menu import (
-    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, MENU_ERROR, ORDER_RECEIPT,
-    ORDER_RECEIPT_LINE_ITEM, ORDER_RESPONSE, SALES_TAX, USER_INPUT_REQUEST,
-    create_catgory_view)
+    CATEGORY_VIEW, INSTRUCTIONS_HEADER, MENU, ORDER_RECEIPT_HEAD,
+    ORDER_RECEIPT_TAIL, REQUEST_MENU_FILE, SALES_TAX,
+    USER_INPUT_REQUEST, create_catgory_view)
 
 setlocale(LC_ALL, '')
 
 
-REQUEST_MENU_FILE = '''
-Would you like to provide a file for loading a menu?
-> '''
-
-
-def category_display(category):
+class SnakesCafeError(Exception):
     """
-    Display a single category with possible menu items.
-
-    See sample output below
-
-    Category
-    --------
-    Food1
-    Food2
+    Base exception for library errors.
     """
-    print(category.title())
-    print('-' * len(category))
-    for food in CATEGORY_VIEW[category]:
-        print(food.title())
 
 
-def menu_display():
-    """
-    Provide a menu for users.
-    """
-    print(INSTRUCTIONS_HEADER)
-    for category in sorted(CATEGORY_VIEW.keys()):
-        print()
-        category_display(category)
+class Order:
+    def __init__(self):
+        """
+        Create a new order with needed metadata.
+        """
+        self.id = uuid4()
+        self._order = {}
 
+    def __repr__(self):
+        """
+        Represent an order in the following form.
 
-def format_food_quantity(food, quantity):
-    """
-    Format beginning of receipt line item.
-    """
-    return '{} x{}'.format(food, quantity)
+        '<Order #{id} | Items: {item_count} | Total: {order_cost}>'.
+        """
+        return f'''<Order #{
+            self.id
+        } | Items: {
+            len(self)
+        } | Total: '{
+            currency(self.total_cost())
+        }'>'''
 
+    def __str__(self):
+        """
+        Format an order into a receipt for printing.
+        """
+        with StringIO as ostream:
+            self.display_order(ostream)
+            return ostream.getvalue()
 
-def receipt_display(order):
-    """
-    Format an order into a receipt.
-    """
-    sub_total = sub_total_cost(order)
-    print(ORDER_RECEIPT.format(
-        id=order['id'],
-        total_due=format(currency(total_cost(order)), '>33'),
-        subtotal=format(currency(sub_total), '>34'),
-        sales_tax=format(currency(calculate_sales_tax(sub_total)), '>33'),
-        items='\n'.join(
-            ORDER_RECEIPT_LINE_ITEM.format(
-                food=format_food_quantity(food, quantity),
-                cost=format(
-                    currency(cost_of_items(food, quantity)),
-                    '>{}'.format(
-                        42 - len(format_food_quantity(food, quantity)))))
-            for food, quantity in order.items()
-            if food != 'id'
-        )
-    ))
+    def __getitem__(self, key):
+        return self._order[key]
 
+    def __setitem__(self, key, value):
+        self._order[key] = value
 
-def remove_order_item(order, *food):
-    """
-    Remove food from order if contained.
+    def __len__(self):
+        return len(self._order)
 
-    Inform the user if the item had not been added to their order.
-    """
-    food = ' '.join(food)
-    if food not in order:
-        print('{} not in order'.format(food))
-    else:
-        order[food] -= 1
-        print('cost of order so far in {}'.format(currency(total_cost(order))))
-        if order[food] == 0:
-            order.pop(food)
+    def __bool__(self):
+        return bool(self._order)
 
+    def __iter__(self):
+        return iter(self._order.items())
 
-def add_order_item(order, *food):
-    """
-    Add a food item to an order or inform user that it is not available.
-    """
-    try:
-        quantity = int(food[-1])
-        food = ' '.join(food[:-1])
-    except(ValueError):
-        quantity = 1
-        food = ' '.join(food)
-    if food not in MENU:
-        print(MENU_ERROR.format(food))
-        return
+    def __contains__(self, key):
+        return key in self._order
 
-    if quantity <= 0:
-        print('That is not a valid quantity!')
-        return
-    check_quantity = order.get(food, 0) + quantity
+    @staticmethod
+    def category_display(category, ostream=stdout):
+        """
+        Display a single category with possible menu items.
 
-    if MENU[food]['quantity'] < check_quantity:
-        print('That is too many! Not enough in stock.')
-        return
+        See sample output below
 
-    order[food] = check_quantity
-    print(ORDER_RESPONSE.format(order[food], food))
-    print('cost of order so far in {}'.format(currency(total_cost(order))))
+        Category
+        --------
+        Food1
+        Food2
+        """
+        print(category.title(), file=ostream)
+        print('-' * len(category), file=ostream)
+        for food in CATEGORY_VIEW[category]:
+            print(food.title(), file=ostream)
 
+    def menu_display(self, ostream=stdout):
+        """
+        Provide a menu for users.
+        """
+        print(INSTRUCTIONS_HEADER, file=ostream)
+        for category in sorted(CATEGORY_VIEW.keys()):
+            print(file=ostream)
+            self.category_display(category, ostream)
 
-def handle_user_action(order, user_request):
-    """
-    Dispatch to handler functions based on user action verb.
-    """
-    action, *options = user_request.split()
-    if action == 'order':
-        receipt_display(order)
-    elif action == 'menu':
-        menu_display()
-    elif action == 'remove':
-        remove_order_item(order, *options)
-    elif action in CATEGORY_VIEW:
-        category_display(user_request)
-    else:
-        add_order_item(order, action, *options)
+    def print_receipt(self):
+        """
+        Format an order into a receipt file.
+        """
+        with open(f'order-{ self.id }.txt') as ostream:
+            self.display_order(ostream)
 
+    def display_order(self, ostream=stdout):
+        """
+        Format an order and output to stream or stdout.
+        """
+        sub_total = self.sub_total_cost()
+        print(ORDER_RECEIPT_HEAD.format(id=self.id), file=ostream)
+        for food, quantity in self:
+            print(
+                format(food, '<23'),
+                'x',
+                format(quantity, '<5'),
+                format(currency(self.cost_of_items(food, quantity)), '>11'),
+                file=ostream)
+        print(ORDER_RECEIPT_TAIL.format(
+            total_due=format(currency(self.total_cost()), '>33'),
+            subtotal=format(currency(sub_total), '>34'),
+            sales_tax=format(
+                currency(self.calculate_sales_tax(sub_total)), '>33'),
+        ), file=ostream)
 
-def handle_input(order, user_request):
-    """
-    Handle input.
+    def remove_item(self, food, quantity=1):
+        """
+        Remove food from order if contained.
 
-    false for exit, true otherwise
-    """
-    user_request = user_request.strip().lower()
-    if not user_request:
-        return True
-    elif user_request == 'quit':
-        return False
-    handle_user_action(order, user_request)
-    return True
+        Inform the user if the item had not been added to their order.
+        """
+        if food not in self:
+            return (food, 'not in order')
+        self[food] -= quantity
+        if self[food] <= 0:
+            self._order.pop(food)
+        return ('cost of order is', currency(self.total_cost()))
 
+    def add_item(self, food, quantity=1):
+        """
+        Add a food item to an order or inform user that it is not available.
+        """
+        if food not in MENU:
+            return (food, 'is not in menu')
+        check_quantity = self._order.get(food, 0) + quantity
 
-def cost_of_items(food, quantity):
-    """
-    Retrieve the current price for a menu item and quantity.
-    """
-    return MENU[food]['price'] * quantity
+        if MENU[food]['quantity'] < check_quantity:
+            return (check_quantity, 'is too many! Not enough in stock.')
 
+        self[food] = check_quantity
+        return (
+            self[food],
+            'order of',
+            food,
+            'have been added to your meal\ncost of order is',
+            currency(self.total_cost()))
 
-def sub_total_cost(order):
-    """
-    Gather costs of idividual line items into a subtotal.
-    """
-    cost = 0
-    for food, quantity in order.items():
-        if food == 'id':
-            continue
-        cost += cost_of_items(food, quantity)
-    return cost
-
-
-def calculate_sales_tax(cost):
-    """
-    Calculate additional cost from sales tax.
-    """
-    return math.ceil(cost * SALES_TAX) / 100
-
-
-def total_cost(order):
-    """
-    Calculate cost of order with sales tax added.
-    """
-    sub_total = sub_total_cost(order)
-    sales_tax = calculate_sales_tax(sub_total)
-    return sub_total + sales_tax
-
-
-def generate_blank_order_with_id():
-    """
-    Create a new order with needed metadata.
-    """
-    return {'id': uuid4()}
-
-
-def load_menu():
-    global CATEGORY_VIEW, MENU
-    file_name = clean_input(REQUEST_MENU_FILE)
-    if not file_name:
-        return
-    try:
-        with open(file_name) as istream:
-            csv_content = istream.read()
-    except OSError:
-        print('File {} could not be found'.format(file_name))
-        return
-    menu = {}
-    for row in DictReader(csv_content.splitlines(), fieldnames=[
-            'name', 'categories', 'price', 'quantity']):
+    @staticmethod
+    def _handle_action_with_quantity(method, action):
+        if not action:
+            return ()
         try:
-            price = float(row['price'].strip())
+            quantity = int(action[-1])
+            if quantity <= 0:
+                return (action[-1], 'is not a valid quantity!')
         except ValueError:
-            print('found ({}) invalid number price'.format(row['price']))
-            return
-        if row['quantity'] is None:
-            quantity = 1
+            return method(' '.join(action))
+        return method(' '.join(action[:-1]), quantity)
+
+    def handle_user_action(self, user_request):
+        """
+        Dispatch to handler functions based on user action verb.
+        """
+        action = user_request.split()
+        if action[0] == 'order':
+            return self.display_order
+        if action[0] == 'menu':
+            return self.menu_display
+        if action[0] == 'remove':
+            return self._handle_action_with_quantity(
+                self.remove_item, action[1:])
+        if action[0] in CATEGORY_VIEW:
+            return lambda *args: self.category_display(' '.join(action), *args)
+        return self._handle_action_with_quantity(self.add_item, action)
+
+    def handle_input(self, user_request, ostream=stdout):
+        """
+        Handle input.
+
+        false for exit, true otherwise
+        """
+        user_request = user_request.strip().lower()
+        if not user_request:
+            return False
+        elif user_request == 'quit':
+            return True
+        response = self.handle_user_action(user_request)
+        if callable(response):
+            response(ostream)
         else:
+            print(*response, file=ostream)
+        return False
+
+    @staticmethod
+    def cost_of_items(food, quantity):
+        """
+        Retrieve the current price for a menu item and quantity.
+        """
+        return MENU[food]['price'] * quantity
+
+    def sub_total_cost(self):
+        """
+        Gather costs of idividual line items into a subtotal.
+        """
+        cost = 0
+        for food, quantity in self:
+            cost += self.cost_of_items(food, quantity)
+        return cost
+
+    @staticmethod
+    def calculate_sales_tax(cost):
+        """
+        Calculate additional cost from sales tax.
+        """
+        return math.ceil(cost * SALES_TAX) / 100
+
+    def total_cost(self):
+        """
+        Calculate cost of order with sales tax added.
+        """
+        sub_total = self.sub_total_cost()
+        sales_tax = self.calculate_sales_tax(sub_total)
+        return sub_total + sales_tax
+
+    def load_menu(self):
+        global CATEGORY_VIEW, MENU
+        file_name = self.clean_input(REQUEST_MENU_FILE)
+        if not file_name:
+            return
+        try:
+            with open(file_name) as istream:
+                csv_content = istream.read()
+        except OSError:
+            return ('File', file_name, 'could not be found')
+        menu = {}
+        for row in DictReader(csv_content.splitlines(), fieldnames=[
+                'name', 'categories', 'price', 'quantity']):
             try:
-                quantity = int(row['quantity'].strip())
+                price = float(row['price'].strip())
             except ValueError:
-                print('found ({}) invalid integer quantity'.format(
-                    row['quantity']))
-                return
-        menu[row['name'].strip()] = {
-            'categories': row['categories'].strip(),
-            'price': price,
-            'quantity': quantity,
-        }
-    MENU = menu
-    CATEGORY_VIEW = create_catgory_view(MENU)
+                return ('found (', row, ') with invalid price')
+            if row['quantity'] is None:
+                quantity = 1
+            else:
+                try:
+                    quantity = int(row['quantity'].strip())
+                except ValueError:
+                    return ('found (', row, ') with invalid quantity')
+            menu[row['name'].strip()] = {
+                'categories': row['categories'].strip(),
+                'price': price,
+                'quantity': quantity,
+            }
+        MENU = menu
+        CATEGORY_VIEW = create_catgory_view(MENU)
 
+    @staticmethod
+    def clean_input(*args):
+        """
+        Handle standard input exceptions and get input line.
+        """
+        try:
+            return input(*args)
+        except EOFError:
+            return 'quit'
 
-def clean_input(*args):
-    """
-    Handle standard input exceptions and get input line.
-    """
-    try:
-        return input(*args)
-    except EOFError:
-        return 'quit'
+    def process_user_order(self, ostream=stdout):
+        response = self.load_menu()
+        if response:
+            print(*response, file=ostream)
+        self.menu_display(ostream)
+        while not self.handle_input(
+                self.clean_input(USER_INPUT_REQUEST),
+                ostream):
+            pass
 
 
 def main():
     """main."""
-    load_menu()
-    menu_display()
-    order = generate_blank_order_with_id()
-    while handle_input(order, user_request=clean_input(USER_INPUT_REQUEST)):
-        pass
+    Order().process_user_order()
 
 
 if __name__ == '__main__':
